@@ -21,7 +21,7 @@ linkedin_username: Andrew Berg
 #########################################################################################
 theme: "minima"
 
-rss: rss 
+# rss: rss 
 
 kramdown:
   syntax_highlighter_opts:
@@ -31,7 +31,7 @@ header_pages:
   - archive.html
 
 plugins:
-  - jekyll-feed
+  # - jekyll-feed
   - jekyll-sitemap
 
 titles_from_headings:
