@@ -1,13 +1,14 @@
-title: "My Blogs Name"
-author: "Andrew Berg"
-description: "Some short description of your blog can go here." # This will show up in places like twitter, linkedin, etc, if you share your sites url as a post.
+title: Andrew's Blog
+author: Andrew Berg
+email: andberg9@gmail.com
+url: https://blog.andrewberg.me
+description: My blog, used for whatever personal projects I am currently undertaking. # This will show up in places like twitter, linkedin, etc, if you share your sites url as a post.
 
 # Email / Social media user names used by the minima theme:
 # All of these are optional and can be removed or commented out
-email: "andberg9@gmail.com"
 # twitter_username: "twitteruser"
-github_username: "AndrewPBerg"
-linkedin_username: "Andrew Berg"
+github_username: AndrewPBerg
+linkedin_username: Andrew Berg
 #facebook_username: username
 #flickr_username: username
 #instagram_username: username
@@ -20,19 +21,24 @@ linkedin_username: "Andrew Berg"
 #########################################################################################
 theme: "minima"
 
-# : rss
+rss: rss 
 
 kramdown:
   syntax_highlighter_opts:
     disable: true
-    
+
+header_pages:
+  - archive.html
+
 plugins:
-  # - jekyll-feed
+  - jekyll-feed
   - jekyll-sitemap
 
 titles_from_headings:
   strip_title: true
   collections: true
+
+code_block_max_height: 500px
 
 defaults:
   - scope:
@@ -40,3 +46,7 @@ defaults:
       type: post
     values:
       tags: Other
+
+home_post_limit: 5
+
+comments_repo: andrewpberg/andrewpberg.github.io
