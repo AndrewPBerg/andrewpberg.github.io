@@ -28,7 +28,9 @@ kramdown:
     disable: true
 
 header_pages:
-  - archive.html
+  - archive.md
+  - contact.md
+  - portfolio.md
 
 plugins:
   # - jekyll-feed
