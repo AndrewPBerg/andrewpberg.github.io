@@ -39,6 +39,9 @@
   z-index: 1000; /* Ensure it's on top of other content */
 }
 
+.main-content {
+  padding-top: 60px;
+}
 
 hr {
   margin-top: 20px;
