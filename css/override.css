@@ -32,14 +32,15 @@
   left: 0;
   right: 0;
   background-color: #fff;
-  padding: 10px 0;
+  padding: 1px 0;
+  border: none;
   box-shadow: none; 
   z-index: 1000; /* Ensure it's on top of other content */
 }
 
 
 hr {
-  margin-top: 30px;
+  margin-top: 20px;
   margin-bottom: 20px;
 }
 
