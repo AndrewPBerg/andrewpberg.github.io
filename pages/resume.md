@@ -4,4 +4,4 @@ title: "Resume"
 permalink: /resume/
 ---
  
-<!-- upload generic resume -->
+<h2>Work in progress </h2>
