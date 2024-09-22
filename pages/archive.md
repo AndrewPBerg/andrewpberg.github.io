@@ -1,6 +1,6 @@
 ---
-layout: page
-title: Blog Archive
+layout: default
+title: "Blog Archive"
 permalink: /archive/
 ---
 
