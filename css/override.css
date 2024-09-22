@@ -1,32 +1,40 @@
 ---
 ---
 
-header {
-  background-color: #333;
+/* Reset default styles for the nav */
+.main-nav ul {
+  list-style-type: none; /* Remove bullet points */
+  margin: 0; /* Remove default margin */
+  padding: 0; /* Remove default padding */
+  display: flex; /* Align items in a row */
+  justify-content: center; /* Center the links */
+}
+
+.main-nav li {
+  margin: 0 15px; /* Space between items */
+}
+
+.main-nav a {
+  text-decoration: none; /* Remove underline from links */
   padding: 10px;
+  color: #000; /* Text color */
+  font-weight: bold; /* Make the text bold */
 }
 
-header nav ul {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
+.main-nav a:hover {
+  color: #007BFF; /* Change color on hover */
 }
 
-header nav ul li {
-  display: inline;
-  margin-right: 15px;
-}
-
-header nav ul li a {
-  text-decoration: none;
-  color: white;
-  padding: 10px;
-  background-color: #333;
-}
-
-header nav ul li a:hover {
-  background-color: #555;
+/* Make the navigation bar fixed at the top */
+.main-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  padding: 10px 0;
+  box-shadow: 0 4px 2px -2px gray; /* Add shadow for depth */
+  z-index: 1000; /* Ensure it's on top of other content */
 }
 
 
