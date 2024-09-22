@@ -33,7 +33,7 @@
   right: 0;
   background-color: #fff;
   padding: 10px 0;
-
+  box-shadow: none; 
   z-index: 1000; /* Ensure it's on top of other content */
 }
 
