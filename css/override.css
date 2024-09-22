@@ -1,6 +1,10 @@
 ---
 ---
 
+.site-footer .author {
+  display: none;
+}
+
 /* Reset default styles for the nav */
 .main-nav ul {
   list-style-type: none; /* Remove bullet points */
