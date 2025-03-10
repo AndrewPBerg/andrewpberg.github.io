@@ -52,6 +52,18 @@ If GitHub Pages is still trying to use Jekyll to build your site (as indicated b
    - Run the "Disable Jekyll" workflow manually from the Actions tab
    - This will create a `.nojekyll` file directly in the deployed branch
 
+### GitHub Actions Version Issues
+
+If you encounter errors related to deprecated GitHub Actions (like `actions/upload-artifact`), the workflows in this repository have been updated to use the latest versions:
+
+- `actions/checkout@v4`
+- `actions/setup-node@v4`
+- `actions/configure-pages@v4`
+- `actions/upload-pages-artifact@v4`
+- `actions/deploy-pages@v4`
+
+If you encounter any version-related errors in the future, check the [GitHub Actions changelog](https://github.blog/changelog/2024-04-16-deprecation-notice-v3-of-the-artifact-actions/) for updates on deprecated actions.
+
 ## Technology Stack
 
 - React
