@@ -1,0 +1,27 @@
+name: Disable Jekyll
+
+on:
+  push:
+    branches:
+      - gh-pages
+  workflow_dispatch:
+
+jobs:
+  disable-jekyll:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: gh-pages
+      
+      - name: Create .nojekyll file
+        run: touch .nojekyll
+      
+      - name: Commit and push if changed
+        run: |
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "GitHub Actions"
+          git add .nojekyll
+          git commit -m "Disable Jekyll processing" || echo "No changes to commit"
+          git push 
