@@ -29,6 +29,18 @@ const projects = [
     }
   },
   {
+    id: 'project5',
+    title: 'andrewpberg.github.io',
+    description: 'This website! Personal Portfolio Website.',
+    tags: ['React', 'Shadcn', 'Vite'],
+    dateRange: 'Jan 2025 - Present',
+    links: {
+      github: 'https://github.com/AndrewPBerg/andrewpberg.github.io',
+      website: 'https://andrewpberg.github.io',
+      paper: null
+    }
+  },
+  {
     id: 'project4',
     title: 'Dope Dictionary',
     description: 'AI dictionary of custom styles and words.',
