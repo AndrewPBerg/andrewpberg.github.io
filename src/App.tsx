@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -39,7 +38,7 @@ const App = () => {
           {showingSplash ? (
             <SplashScreen onComplete={handleSplashComplete} />
           ) : (
-            <BrowserRouter>
+            <BrowserRouter basename="/">
               <Routes>
                 <Route path="/" element={<Layout />}>
                   <Route index element={<Navigate to="/info" replace />} />
