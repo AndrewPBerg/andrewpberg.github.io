@@ -4,6 +4,16 @@ This repository contains the source code for my personal website hosted at [andr
 
 Feel free to clone this code for your own use case. Just make sure to credit me on the site thanks 🤝
 
+## Info
+used the following stack:
+- three.js
+- GSAP
+- vantra.js
+- vite
+- react
+- node.js
+- lucide UI
+
 ## Development
 
 To run the development server:
