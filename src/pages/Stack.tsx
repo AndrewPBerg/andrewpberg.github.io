@@ -7,6 +7,8 @@ const Stack = () => {
       name: 'Languages',
       items: [
         { name: 'Python', icon: Beaker },
+        { name: 'Java', icon: Beaker },
+        { name: 'C', icon: Beaker },
         { name: 'JavaScript', icon: Zap },
         { name: 'TypeScript', icon: Zap },
         { name: 'HTML', icon: Code },
@@ -14,24 +16,23 @@ const Stack = () => {
       ],
     },
     {
-      name: 'Frameworks',
+      name: 'JS Frameworks',
       items: [
         { name: 'React', icon: Zap },
         { name: 'Next.js', icon: Zap },
-        { name: 'Tailwind CSS', icon: Code },
-        { name: 'GSAP', icon: Zap },
+        { name: 'Node.js', icon: Zap },
+        { name: 'Vite', icon: Zap },
+        { name: 'tailwindcss', icon: Code },
       ],
     },
     {
       name: 'Databases',
       items: [
         { name: 'MySQL', icon: Database },
-        { name: 'PostgreSQL', icon: Database },
-        { name: 'MongoDB', icon: Database },
       ],
     },
     {
-      name: 'ML/AI',
+      name: 'Python Frameworks',
       items: [
         { name: 'TensorFlow', icon: Beaker },
         { name: 'PyTorch', icon: Beaker },
