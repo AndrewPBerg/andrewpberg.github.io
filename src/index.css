@@ -138,6 +138,58 @@
   display: none;  /* Chrome, Safari and Opera */
 }
 
+/* Splash screen styles */
+.absolute-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  width: 100%;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .section-heading {
+    @apply text-2xl;
+  }
+  
+  .content-container {
+    max-height: 70vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 5rem; /* Ensure content doesn't overlap with navigation */
+  }
+  
+  .content-container::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .content-container {
+    scrollbar-width: none;
+  }
+  
+  /* Ensure content is properly centered and doesn't overlap with UI elements */
+  .content-container > div {
+    padding: 1rem;
+    max-width: 100%;
+  }
+  
+  /* Improve tap targets for mobile */
+  button {
+    min-height: 25px;
+    min-width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Ensure theme toggle is easily tappable */
+  .theme-toggle {
+    touch-action: manipulation;
+  }
+}
+
 /* Font face declarations */
 @font-face {
   font-family: 'Inter var';
