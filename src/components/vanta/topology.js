@@ -10,15 +10,8 @@ class Effect extends P5Base {
   static initClass() {
     this.prototype.p5 = true
     this.prototype.defaultOptions = {
-      color: 0x99b64e,
+      color: 0x89964e,
       backgroundColor: 0x002222,
-      speed: 0.9,
-      particleCount: 4500,
-      particleSize: 1.3,
-      flowCellSize: 8,
-      noiseSize: 0.005,
-      noiseRadius: 0.15,
-      offset: 50
     }
   }
   constructor(userOptions) {
@@ -31,94 +24,56 @@ class Effect extends P5Base {
     let sketch = function(p) {
       let width = t.width
       let height = t.height
-      let offset = t.options.offset || 0;
+      let offset = 100
 
-      // Adjust the offset value to bring the animation into view
-      offset = Math.max(0, offset); // Ensure offset is non-negative
+      let flow_cell_size = 10
 
-      // Get customization options with defaults
-      let flow_cell_size = t.options.flowCellSize || 8
-      let noise_size = t.options.noiseSize || 0.005
-      let noise_radius = t.options.noiseRadius || 0.15
-      let number_of_particles = t.options.particleCount || 6000
-      const particleSize = t.options.particleSize || 1.5
-      const speed = t.options.speed || 1.0
+      let noise_size = 0.003
+      let noise_radius = 0.1
 
-      // Calculate flow grid dimensions once
-      let flow_width = Math.ceil((width + offset * 2) / flow_cell_size)
-      let flow_height = Math.ceil((height + offset * 2) / flow_cell_size)
+      let flow_width = (width + offset * 2) / flow_cell_size
+      let flow_height = (height + offset * 2) / flow_cell_size
 
+      let noise_grid = []
       let flow_grid = []
+
+      let number_of_particles = 4500
       let particles = []
-      let frameCount = 0
-      let lastFrameTime = 0
-      let frameRateFactor = 1.0
-      
-      // Store current color for efficient updates
-      let currentColor = t.options.color
-      let currentBgColor = t.options.backgroundColor
-      
+
+      let tick = 0
       p.setup = function() {
         t.initP5(p) // sets bg too
         p.smooth()
         p.noStroke()
-        
-        // Initialize particles and flow
+        //p.blendMode(p.OVERLAY)
+
         init_particles()
         init_flow()
-        
-        // Set a reasonable framerate for balance between performance and visual quality
-        p.frameRate(60)
       }
-      
       p.draw = function() {
-        // Check if colors have changed
-        if (currentColor !== t.options.color || currentBgColor !== t.options.backgroundColor) {
-          currentColor = t.options.color
-          currentBgColor = t.options.backgroundColor
-          
-          // Update canvas background color
-          if (p.canvas) {
-            p.canvas.style.backgroundColor = color2Rgb(currentBgColor, 1)
-          }
-        }
-        
-        // Calculate frame rate factor to maintain consistent animation speed
-        const currentTime = p.millis()
-        if (lastFrameTime > 0) {
-          const idealFrameTime = 1000 / 60 // 60 FPS
-          const actualFrameTime = currentTime - lastFrameTime
-          frameRateFactor = Math.min(2.0, Math.max(0.5, actualFrameTime / idealFrameTime))
-        }
-        lastFrameTime = currentTime;
-        
-        // Clear the canvas and draw all particles
-        p.clear() // Use clear instead of background for better performance
         p.translate(-offset, -offset)
+        //display_flow()
         update_particles()
         display_particles()
-        
-        frameCount++
+        tick += 0.002
       }
 
       function init_particles() {
-        // Pre-allocate particles array for better performance
-        particles = new Array(number_of_particles)
         for (let i = 0; i < number_of_particles; i++) {
           let r = p.random(p.width + 2 * offset)
           let q = p.random(p.height + 2 * offset)
-          particles[i] = {
+          particles.push({
             prev: p.createVector(r, q),
             pos: p.createVector(r, q),
             vel: p.createVector(0, 0),
             acc: p.createVector(0, 0),
+            col: p.random(255),
             seed: i
-          }
+          })
         }
       }
 
       function update_particles() {
-        // Update all particles for visual quality
         for (let i = 0; i < number_of_particles; i++) {
           let prt = particles[i]
           let flow = get_flow(prt.pos.x, prt.pos.y)
@@ -126,44 +81,39 @@ class Effect extends P5Base {
           prt.prev.x = prt.pos.x
           prt.prev.y = prt.pos.y
 
-          // Apply velocity with frame rate compensation
-          const adjustedSpeed = speed * frameRateFactor
-          prt.pos.x = mod(prt.pos.x + prt.vel.x * adjustedSpeed, p.width + 2 * offset)
-          prt.pos.y = mod(prt.pos.y + prt.vel.y * adjustedSpeed, p.height + 2 * offset)
+          prt.pos.x = mod(prt.pos.x + prt.vel.x, p.width + 2 * offset)
+          prt.pos.y = mod(prt.pos.y + prt.vel.y, p.height + 2 * offset)
 
           prt.vel
             .add(prt.acc)
             .normalize()
-            // Adjust velocity based on speed option
-            .mult(2.2 * adjustedSpeed)
+            .mult(2.2)
 
+          //prt.acc = p5.Vector.fromAngle(p.noise(prt.seed * 10, tick) * p.TAU).mult(0.01)
           prt.acc = p.createVector(0, 0)
-          // Adjust acceleration based on speed option
-          prt.acc.add(flow).mult(3 * adjustedSpeed)
+          prt.acc.add(flow).mult(3)
         }
       }
 
       function init_flow() {
-        // Pre-allocate flow grid for better performance
-        flow_grid = new Array(flow_height)
         for (let i = 0; i < flow_height; i++) {
-          flow_grid[i] = new Array(flow_width)
+          let row = []
           for (let j = 0; j < flow_width; j++) {
-            flow_grid[i][j] = calculate_flow(j * noise_size, i * noise_size, noise_radius)
+            row.push(calculate_flow(j * noise_size, i * noise_size, noise_radius))
           }
+          flow_grid.push(row)
         }
       }
 
       function calculate_flow(x, y, r) {
+        //console.log(x,y)
         let high_val = 0
         let low_val = 1
         let high_pos = p.createVector(0, 0)
         let low_pos = p.createVector(0, 0)
 
-        // Use enough sampling points for good visual quality
-        const samplePoints = 60
-        for (let i = 0; i < samplePoints; i++) {
-          let angle = i / samplePoints * p.TAU
+        for (let i = 0; i < 100; i++) {
+          let angle = i / 100 * p.TAU
           let pos = p.createVector(x + p.cos(angle) * r, y + p.sin(angle) * r)
           let val = p.noise(pos.x, pos.y)
 
@@ -186,49 +136,51 @@ class Effect extends P5Base {
       }
 
       function get_flow(xpos, ypos) {
-        xpos = p.constrain(xpos, 0, p.width + offset * 2 - 1)
-        ypos = p.constrain(ypos, 0, p.height + offset * 2 - 1)
-        const x = Math.floor(xpos / flow_cell_size)
-        const y = Math.floor(ypos / flow_cell_size)
-        // Add bounds checking to prevent errors
-        if (y >= 0 && y < flow_grid.length && x >= 0 && x < flow_grid[y].length) {
-          return flow_grid[y][x]
-        }
-        return p.createVector(0, 0)
+        xpos = p.constrain(xpos, 0, p.width + offset * 2)
+        ypos = p.constrain(ypos, 0, p.height + offset * 2)
+        return flow_grid[p.floor(ypos / flow_cell_size)][p.floor(xpos / flow_cell_size)]
       }
 
       function display_particles() {
-        // Adjust stroke weight based on particleSize option
-        p.strokeWeight(particleSize)
-        // Use a more opaque stroke for better visual effect
-        p.stroke(color2Rgb(t.options.color, 0.15))
-        
-        // Draw all particles for better visual quality
+        p.strokeWeight(1)
+        // 255, 240, 220
+        p.stroke(color2Rgb(t.options.color, 0.05))
         for (let i = 0; i < particles.length; i++) {
-          const particle = particles[i]
-          if (p5.Vector.dist(particle.prev, particle.pos) < 10 * speed) {
-            p.line(particle.prev.x, particle.prev.y, particle.pos.x, particle.pos.y)
+          //p.stroke(particles[i].col)
+          //p.point(particles[i].pos.x, particles[i].pos.y)
+          if (p5.Vector.dist(particles[i].prev, particles[i].pos) < 10)
+            p.line(particles[i].prev.x, particles[i].prev.y, particles[i].pos.x, particles[i].pos.y)
+        }
+      }
+
+      function display_flow() {
+        for (let i = 0; i < flow_grid.length; i++) {
+          for (let j = 0; j < flow_grid[i].length; j++) {
+            p.strokeWeight(1)
+            p.stroke(255, 0, 0)
+            p.noFill()
+            p.ellipse(j * flow_cell_size, i * flow_cell_size, 7, 7)
+            p.line(
+              j * flow_cell_size,
+              i * flow_cell_size,
+              j * flow_cell_size + flow_grid[i][j].x * 50,
+              i * flow_cell_size + flow_grid[i][j].y * 50
+            )
           }
         }
       }
+
+      // p.keyPressed = function() {
+      //   if (p.keyCode === 80) {
+      //     p.saveCanvas('landslide', 'jpeg')
+      //   }
+      // }
 
       function mod(x, n) {
         return (x % n + n) % n
       }
     }
     new p5(sketch)
-  }
-  
-  // Add a setOptions method to update options without reinitializing
-  setOptions(options = {}) {
-    // Store previous options for comparison
-    const prevOptions = { ...this.options }
-    
-    // Update options
-    Object.assign(this.options, options)
-    
-    // No need to do anything else - the draw loop will handle color changes
-    // This prevents the animation from restarting on color changes
   }
 }
 Effect.initClass()

@@ -43,7 +43,7 @@ const TopologyEffect = memo(({ activeSection = 'info' }: TopologyEffectProps) =>
 
   // Initialize the effect only once
   useEffect(() => {
-    if (!vantaRef.current || !p5Loaded || isInitialized) return;
+    if (!vantaRef.current || !p5Loaded) return;
     
     // Set initialMount to false after first initialization
     initialMountRef.current = false;
@@ -55,27 +55,37 @@ const TopologyEffect = memo(({ activeSection = 'info' }: TopologyEffectProps) =>
     const backgroundColor = sectionColors.background;
     const foregroundColor = sectionColors.foreground;
 
-    // Initialize the effect with balanced settings for performance and visuals
+    // If effect already exists but theme changed, destroy it first
+    if (vantaEffectRef.current) {
+      vantaEffectRef.current.destroy();
+      vantaEffectRef.current = null;
+    }
+
+    // Initialize the effect with smoother settings and without pulse/wave effects
     try {
       vantaEffectRef.current = TOPOLOGY({
         el: vantaRef.current,
         p5: p5,
-        mouseControls: false,
-        touchControls: false,
+        mouseControls: true,  // Keep mouse interaction which isn't too heavy
+        touchControls: true,  
         gyroControls: false,
         minHeight: 100.00,
         minWidth: 100.00,
-        scale: 1.5,
+        scale: 1.0,
         scaleMobile: 0.8,
         color: foregroundColor,
         backgroundColor: backgroundColor,
-        speed: 2,               // Balanced speed
-        particleCount: 4500,      // Match the updated particle count
-        particleSize: 1.3,        // Match the updated particle size
-        flowCellSize: 10,          // Match the updated flow cell size
-        noiseSize: 0.005,         // Match the updated noise size
-        noiseRadius: 0.1,        // Match the updated noise radius
-        offset: 50,              // Keep the offset value
+        speed: 1.0,           // Moderate speed for smooth movement
+        particleCount: 4000,  // Number of particles from topology.js
+        particleSize: 1.4,
+        flowCellSize: 10,     // Match the flow_cell_size in topology.js
+        noiseSize: 0.003,     // Match the noise_size in topology.js
+        noiseRadius: 0.1,     // Match the noise_radius in topology.js
+        colorMode: 'variance', // Custom parameter for color
+        colorVariance: 0.25,  // Custom parameter for color variance
+        pulseIntensity: 0,    // Remove pulse effect completely
+        pulseSpeed: 0,        // Remove pulse speed
+        offset: 100,          // Match the offset in topology.js
       });
 
       setIsInitialized(true);
@@ -84,40 +94,23 @@ const TopologyEffect = memo(({ activeSection = 'info' }: TopologyEffectProps) =>
     } catch (error) {
       console.error("Failed to initialize topology effect:", error);
     }
-  }, [p5Loaded, isInitialized, theme, activeSection]);
+  }, [p5Loaded, theme, activeSection]);
 
-  // Update colors when theme or section changes, but don't reinitialize the effect
+  // Replace the complex update effect with a simpler one that just triggers reinitialization
   useEffect(() => {
     if (!isInitialized || !vantaEffectRef.current) return;
     
     // Only update if theme or section has changed
     if (theme !== prevThemeRef.current || activeSection !== prevSectionRef.current) {
-      try {
-        // Get colors based on theme and active section
-        const themeColors = colorSchemes[theme as 'dark' | 'light'];
-        const sectionColors = themeColors[activeSection as keyof typeof themeColors] || themeColors.info;
-        
-        const backgroundColor = sectionColors.background;
-        const foregroundColor = sectionColors.foreground;
-
-        // Update colors without reinitializing the effect
-        if (vantaEffectRef.current.options) {
-          vantaEffectRef.current.options.backgroundColor = backgroundColor;
-          vantaEffectRef.current.options.color = foregroundColor;
-          
-          // Force a redraw if the effect has a setOptions method
-          if (typeof vantaEffectRef.current.setOptions === 'function') {
-            vantaEffectRef.current.setOptions({
-              backgroundColor,
-              color: foregroundColor
-            });
-          }
-        }
-
-        prevThemeRef.current = theme;
-        prevSectionRef.current = activeSection;
-      } catch (error) {
-        console.error("Failed to update topology effect colors:", error);
+      // Get colors based on theme and active section
+      const themeColors = colorSchemes[theme as 'dark' | 'light'];
+      const sectionColors = themeColors[activeSection as keyof typeof themeColors] || themeColors.info;
+      
+      // Destroy and recreate the effect to properly apply the new background color
+      if (vantaEffectRef.current) {
+        vantaEffectRef.current.destroy();
+        vantaEffectRef.current = null;
+        setIsInitialized(false); // This will trigger the initialization effect
       }
     }
   }, [theme, activeSection, isInitialized]);
@@ -125,11 +118,13 @@ const TopologyEffect = memo(({ activeSection = 'info' }: TopologyEffectProps) =>
   return (
     <div 
       ref={vantaRef} 
-      className="fixed top-0 left-0 w-full h-full -z-10 opacity-30 will-change-transform"
+      className="fixed top-0 left-0 w-full h-full -z-10 opacity-60 will-change-transform" // Increased opacity
       aria-hidden="true"
       style={{ 
-        transform: 'translate3d(0,0,0)', // Force hardware acceleration
-        backfaceVisibility: 'hidden' 
+        transform: 'translate3d(0,0,0)',
+        backfaceVisibility: 'hidden',
+        mixBlendMode: 'normal', // Normal blend for clarity
+        filter: 'contrast(1.05) brightness(1.02)' // Reduced filter intensity
       }}
     />
   );
