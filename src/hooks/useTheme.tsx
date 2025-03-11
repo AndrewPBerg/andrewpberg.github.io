@@ -15,7 +15,7 @@ type ThemeProviderState = {
 };
 
 const initialState: ThemeProviderState = {
-  theme: "dark", // Changed default to dark
+  theme: "dark",
   setTheme: () => null,
 };
 
@@ -23,7 +23,7 @@ const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
 export function ThemeProvider({
   children,
-  defaultTheme = "dark", // Changed default to dark
+  defaultTheme = "dark",
   storageKey = "theme",
   ...props
 }: ThemeProviderProps) {
@@ -31,35 +31,46 @@ export function ThemeProvider({
     () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
   );
 
+  // Optimized theme application for better performance
   useEffect(() => {
     const root = window.document.documentElement;
     
-    // Apply transition class first (before changing classes)
-    root.classList.add('theme-transition');
-    
-    // Remove existing theme classes
-    root.classList.remove("light", "dark");
+    // Apply transition class with minimal DOM operations
+    const applyTheme = (newTheme: string) => {
+      requestAnimationFrame(() => {
+        // Apply transition class first (before changing classes)
+        root.classList.add('theme-transition');
+        
+        // Update the document theme with minimal repaints
+        root.classList.remove("light", "dark");
+        root.classList.add(newTheme);
+        
+        // Dispatch custom event for theme change
+        window.dispatchEvent(new CustomEvent('themechange', { 
+          detail: { theme: newTheme } 
+        }));
+        
+        // Remove transition class after the change is complete
+        const transitionTimeout = setTimeout(() => {
+          root.classList.remove('theme-transition');
+        }, 300);
+        
+        return () => clearTimeout(transitionTimeout);
+      });
+    };
     
     if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
         ? "dark"
         : "light";
       
-      root.classList.add(systemTheme);
+      applyTheme(systemTheme);
     } else {
-      root.classList.add(theme);
+      applyTheme(theme);
     }
-    
-    // Remove transition class after the change is complete
-    const transitionTimeout = setTimeout(() => {
-      root.classList.remove('theme-transition');
-    }, 300); // Match this with the CSS transition duration
-    
-    return () => clearTimeout(transitionTimeout);
   }, [theme]);
 
-  // Add listener for system theme changes
+  // Optimized system theme change listener
   useEffect(() => {
     if (theme !== 'system') return;
 
@@ -67,28 +78,39 @@ export function ThemeProvider({
     
     const handleChange = () => {
       const root = window.document.documentElement;
+      const systemTheme = mediaQuery.matches ? "dark" : "light";
       
-      // Add transition class for system theme changes
-      root.classList.add('theme-transition');
-      
-      root.classList.remove("light", "dark");
-      root.classList.add(mediaQuery.matches ? "dark" : "light");
-      
-      // Remove transition class after the change is complete
-      setTimeout(() => {
-        root.classList.remove('theme-transition');
-      }, 300);
+      // Use requestAnimationFrame for smoother transitions
+      requestAnimationFrame(() => {
+        // Add transition class for system theme changes
+        root.classList.add('theme-transition');
+        
+        root.classList.remove("light", "dark");
+        root.classList.add(systemTheme);
+        
+        // Dispatch custom event for theme change
+        window.dispatchEvent(new CustomEvent('themechange', { 
+          detail: { theme: systemTheme } 
+        }));
+        
+        // Remove transition class after the change is complete
+        setTimeout(() => {
+          root.classList.remove('theme-transition');
+        }, 300);
+      });
     };
     
+    // Use the modern event listener approach
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, [theme]);
 
   const value = {
     theme,
-    setTheme: (theme: Theme) => {
-      localStorage.setItem(storageKey, theme);
-      setTheme(theme);
+    setTheme: (newTheme: Theme) => {
+      // Store theme in localStorage and update state in one pass
+      localStorage.setItem(storageKey, newTheme);
+      setTheme(newTheme);
     },
   };
 

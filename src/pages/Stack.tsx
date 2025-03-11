@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Beaker, Zap, Database, Code, Github } from 'lucide-react';
 
@@ -53,13 +54,20 @@ const Stack = () => {
   ]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 will-change-transform">
       {skills.map((skill) => (
         <div key={skill.name} className="pt-2">
-          <h3 className="text-xs font-medium mb-2 text-foreground">{skill.name}</h3>
-          <div className="flex flex-wrap gap-1">
+          <h3 className="text-xs font-medium tracking-wide mb-2 text-foreground font-sans antialiased will-change-transform" 
+              style={{ fontSmooth: 'always', textRendering: 'optimizeLegibility' }}>
+            {skill.name}
+          </h3>
+          <div className="flex flex-wrap gap-1.5">
             {skill.items.map((item) => (
-              <span key={item.name} className="px-2 py-0.5 bg-secondary/50 text-secondary-foreground rounded-full text-[10px]">
+              <span 
+                key={item.name} 
+                className="px-3 py-1 bg-secondary/60 text-secondary-foreground rounded-full text-[11px] font-medium tracking-wide antialiased transform-gpu"
+                style={{ fontSmooth: 'always', textRendering: 'optimizeLegibility' }}
+              >
                 {item.name}
               </span>
             ))}

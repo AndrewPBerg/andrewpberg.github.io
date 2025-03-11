@@ -7,9 +7,10 @@ const Info = () => {
   return (
     <div className="space-y-4">
       <div ref={contentRef} className="space-y-4">
-        <p className="text-s text-muted-foreground">
+
+        <h2 className="text-m  text-secondary-foreground font-medium antialiased  text-bold">
           AI & Full-Stack Developer
-        </p>
+        </h2>
         
         <p className="text-xs text-muted-foreground">
           Building the future of intelligent applications.

@@ -1,3 +1,4 @@
+
 /**
  * Color schemes for the topology effect based on theme and section
  * 
@@ -23,38 +24,38 @@ export interface ColorSchemes {
 const colorSchemes: ColorSchemes = {
   dark: {
     info: {
-      background: 0x1f1f1f,
-      foreground: 0x4a8bff, // Brighter Blue
+      background: 0x000000,
+      foreground: 0x2c5282, // Medium dark blue
     },
     contact: {
-      background: 0x1f1f1f,
-      foreground: 0xff2e2e, // Brighter Red
+      background: 0x000000,
+      foreground: 0xdcdcdc, // Light grey
     },
     stack: {
-      background: 0x1f1f1f,
-      foreground: 0x05ff48, // Brighter Green
+      background: 0x000000,
+      foreground: 0x90cdf4, // Light blue
     },
     projects: {
-      background: 0x1f1f1f,
-      foreground: 0xae00ff, // Brighter Purple
+      background: 0x000000,
+      foreground: 0x4a5568, // Dark grey
     },
   },
   light: {
     info: {
       background: 0xffffff,
-      foreground: 0x0066cc, // Stronger Blue
+      foreground: 0x4a5568, // Dark gray
     },
     contact: {
       background: 0xffffff,
-      foreground: 0xcc0000, // Stronger Red
+      foreground: 0x2b6cb0, // Dark blue
     },
     stack: {
       background: 0xffffff,
-      foreground: 0x6b8e23, // Stronger Green
+      foreground: 0xe2e8f0, // Light gray
     },
     projects: {
       background: 0xffffff,
-      foreground: 0xcc9900, // Stronger Gold
+      foreground: 0x63b3ed, // Medium light blue
     },
   },
 };

@@ -24,10 +24,8 @@ const Layout = () => {
   const { theme, setTheme } = useTheme();
   const isMobile = useIsMobile();
   
-  // Memoize the active section to prevent unnecessary re-renders of TopologyEffect
   const memoizedActiveSection = useMemo(() => activeSection, [activeSection]);
   
-  // Optimized section change handler
   const handleSectionChange = useCallback((id: string) => {
     if (isAnimating || id === activeSection) return;
     
@@ -40,11 +38,10 @@ const Layout = () => {
         tlRef.current.kill();
       }
       
-      // Simplified exit animation
       const exitTl = gsap.timeline({
         defaults: {
-          ease: "power1.in", // Simpler easing
-          duration: isMobile ? 0.15 : 0.2, // Faster animations
+          ease: "power1.in",
+          duration: isMobile ? 0.1 : 0.15,
           force3D: true,
         },
         onComplete: () => {
@@ -54,10 +51,9 @@ const Layout = () => {
       
       tlRef.current = exitTl;
       
-      // Simpler animation with fewer properties
       exitTl.to(currentContentRef, {
         opacity: 0,
-        y: -5,
+        y: -3,
       });
     } else {
       navigate(`/${id}`);
@@ -66,14 +62,15 @@ const Layout = () => {
   }, [activeSection, isAnimating, isMobile, navigate]);
   
   const toggleTheme = useCallback(() => {
-    document.body.classList.add('theme-transition');
-    setTheme(prevTheme => prevTheme === 'dark' ? 'light' : 'dark');
-    setTimeout(() => {
-      document.body.classList.remove('theme-transition');
-    }, 200);
-  }, [setTheme]);
+    requestAnimationFrame(() => {
+      document.documentElement.classList.add('theme-transition');
+      setTheme(theme === 'dark' ? 'light' : 'dark');
+      setTimeout(() => {
+        document.documentElement.classList.remove('theme-transition');
+      }, 200);
+    });
+  }, [theme, setTheme]);
   
-  // Update active section based on URL
   useEffect(() => {
     const path = location.pathname.slice(1) || 'info';
     if (path !== activeSection) {
@@ -82,29 +79,24 @@ const Layout = () => {
     }
   }, [location, activeSection]);
   
-  // Simplified button glow effect
   useEffect(() => {
-    // Clear existing styles
-    sections.forEach(section => {
-      const buttonRef = buttonRefs.current[section.id];
-      if (buttonRef) {
-        gsap.killTweensOf(buttonRef);
-        buttonRef.style.boxShadow = 'none';
-      }
-    });
-    
-    // Directly set styles without animation
     const activeButtonRef = buttonRefs.current[activeSection];
+    
     if (activeButtonRef) {
       const glowColor = theme === 'dark'
         ? 'rgba(200, 200, 200, 0.5)'
         : 'rgba(80, 80, 80, 0.3)';
       
       activeButtonRef.style.boxShadow = `0 0 6px 1px ${glowColor}`;
+      
+      return () => {
+        if (activeButtonRef) {
+          activeButtonRef.style.boxShadow = 'none';
+        }
+      };
     }
   }, [activeSection, theme]);
   
-  // Optimized content transitions
   useEffect(() => {
     const activeContentRef = contentRefs.current[activeSection];
     if (!activeContentRef) return;
@@ -120,11 +112,10 @@ const Layout = () => {
     
     setIsAnimating(true);
     
-    // Simpler timeline with fewer properties
     const tl = gsap.timeline({
       defaults: {
-        ease: "power2.out", // Simpler easing
-        duration: 0.3, // Faster animation
+        ease: "power2.out",
+        duration: 0.2,
         force3D: true,
       },
       onComplete: () => {
@@ -134,37 +125,16 @@ const Layout = () => {
     
     tlRef.current = tl;
     
-    // Set initial state directly
     gsap.set(activeContentRef, { 
       opacity: 0, 
-      y: 5,
+      y: 3,
       display: 'block'
     });
     
-    // Simple animation
     tl.to(activeContentRef, { 
       opacity: 1, 
       y: 0,
     });
-    
-    // Simplified child animations - only if needed
-    const hasChildren = activeContentRef.children.length > 0 && 
-                        activeContentRef.children[0].children.length > 0;
-    
-    if (hasChildren) {
-      const children = activeContentRef.children[0].children;
-      // Faster, simpler stagger animation
-      tl.fromTo(
-        children,
-        { opacity: 0 },
-        { 
-          opacity: 1, 
-          stagger: 0.01, // Much faster stagger
-          duration: 0.2,
-        },
-        "-=0.1" // Less overlap
-      );
-    }
     
     return () => {
       if (tlRef.current) {
@@ -173,44 +143,41 @@ const Layout = () => {
     };
   }, [activeSection, previousSection, isMobile]);
   
-  // Memoize topology effect with theme dependency
   const topologyEffect = useMemo(() => (
-    <TopologyEffect key={`topology-${theme}`} activeSection={memoizedActiveSection} />
-  ), [memoizedActiveSection, theme]);
+    <TopologyEffect activeSection={memoizedActiveSection} />
+  ), [memoizedActiveSection]);
   
   return (
     <div className="min-h-screen flex flex-col p-4 md:p-8">
       {topologyEffect}
       
-      {/* Theme Toggle - optimized with hardware acceleration */}
-      <div className={`fixed ${isMobile ? 'top-6 left-6' : 'top-6 right-6'} z-50`}>
-        <div className="flex items-center">
-          <span className={`${isMobile ? 'text-sm' : 'text-xs'} mr-2 font-sans tracking-wide`}>
+      <div className={`fixed ${isMobile ? 'top-6 right-6' : 'top-6 right-6'} z-50`}>
+        <button
+          onClick={toggleTheme}
+          className={`theme-toggle-btn glass-panel group flex items-center gap-2 px-3 py-2 rounded-full border transition-all duration-200 will-change-transform ${
+            theme === 'dark' 
+              ? 'bg-background/40 border-primary/20 hover:bg-background/60' 
+              : 'bg-background/60 border-border hover:bg-background/80'
+          }`}
+          aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+          style={{ transform: 'translateZ(0)' }}
+        >
+          <div className="relative w-10 h-5 flex items-center rounded-full transition-colors duration-200 bg-gradient-to-r from-muted to-muted/70 p-0.5">
+            <div 
+              className={`absolute w-4 h-4 rounded-full transition-all duration-200 shadow-sm will-change-transform ${
+                theme === 'dark' 
+                  ? 'translate-x-5 bg-primary' 
+                  : 'translate-x-0 bg-background'
+              }`}
+              style={{ transform: `translateZ(0) translateX(${theme === 'dark' ? '20px' : '0px'})` }}
+            />
+          </div>
+          <span className="text-xs font-medium tracking-wider">
             {theme === 'dark' ? 'DARK' : 'LIGHT'}
           </span>
-          <button
-            onClick={toggleTheme}
-            className={`theme-toggle ${isMobile ? 'w-10 h-3' : 'w-10 h-6'} transition-colors duration-200 ${
-              theme === 'dark' 
-                ? 'bg-primary border-primary' 
-                : 'bg-secondary border-secondary'
-            } border rounded-sm will-change-transform`}
-            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-            style={{ transform: 'translateZ(0)' }}
-          >
-            <div 
-              className={`${isMobile ? 'w-3 h-3' : 'w-3 h-3'} transition-transform duration-200 will-change-transform ${
-                theme === 'dark' 
-                  ? `bg-background ${isMobile ? 'translate-x-4' : 'translate-x-5'}` 
-                  : `bg-foreground ${isMobile ? '-translate-x-0' : 'translate-x-2'}`
-              }`}
-              style={{ transform: `translateZ(0) translate3d(${theme === 'dark' ? (isMobile ? '4px' : '5px') : (isMobile ? '0' : '2px')}, 0, 0)` }}
-            />
-          </button>
-        </div>
+        </button>
       </div>
       
-      {/* Desktop Navigation and Content */}
       {!isMobile && (
         <div className="fixed right-8 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-4 items-end">
           <div className="flex flex-col gap-6 items-end">
@@ -244,10 +211,10 @@ const Layout = () => {
                 {section.id === activeSection && (
                   <div 
                     ref={el => contentRefs.current[section.id] = el}
-                    className="content-container mt-6 w-80 pr-6 will-change-transform"
+                    className="content-container glass-panel mt-6 w-80 pr-6 will-change-transform"
                     style={{ opacity: 0, transform: 'translateZ(0)' }}
                   >
-                    <div>
+                    <div className="p-4">
                       <Outlet />
                     </div>
                   </div>
@@ -258,19 +225,17 @@ const Layout = () => {
         </div>
       )}
       
-      {/* Mobile Navigation and Content */}
       {isMobile && (
         <>
-          {/* Mobile Navigation Menu - Fixed at bottom */}
           <div className="fixed bottom-6 left-0 right-0 z-50">
             <div className="flex flex-row justify-center mx-auto">
-              <div className="bg-background/90 backdrop-blur-md py-3 px-6 rounded-full shadow-md flex items-center gap-8 border border-border/30"
+              <div className="menu-glass py-3 px-6 rounded-full shadow-md flex items-center gap-8 border border-border/30"
                    style={{ transform: 'translateZ(0)' }}>
                 {sections.map((section) => (
                   <button
                     key={section.id}
                     onClick={() => handleSectionChange(section.id)}
-                    className={`group flex flex-col items-center gap-1.5 focus:outline-none ${
+                    className={`group flex flex-col items-center gap-1.5 py-1 px-1 focus:outline-none ${
                       isAnimating ? 'pointer-events-none opacity-70' : ''
                     }`}
                     disabled={isAnimating}
@@ -286,7 +251,7 @@ const Layout = () => {
                     />
                     <span className={`text-xs font-medium tracking-wide transition-colors duration-200 ${
                       section.id === activeSection 
-                        ? 'text-primary' 
+                        ? 'text-primary font-semibold' 
                         : 'text-muted-foreground/70 group-hover:text-muted-foreground'
                     }`}>
                       {section.title}
@@ -297,16 +262,29 @@ const Layout = () => {
             </div>
           </div>
           
-          {/* Mobile Content - Centered in view */}
           {sections.map((section) => (
             section.id === activeSection && (
               <div 
                 key={section.id}
                 ref={el => contentRefs.current[section.id] = el}
-                className="content-container fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[90vw] px-4 will-change-transform"
-                style={{ opacity: 0, transform: 'translate3d(-50%, -50%, 0)' }}
+                className={`content-container glass-panel fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 will-change-transform ${
+                  section.id === 'contact' 
+                    ? 'w-auto max-w-[85vw]'
+                    : 'w-full max-w-[90vw]'
+                }`}
+                style={{ 
+                  opacity: 0, 
+                  transform: 'translate3d(-50%, -50%, 0)',
+                  maxHeight: '70vh',
+                  overflowY: 'auto',
+                  WebkitOverflowScrolling: 'touch',
+                  msOverflowStyle: 'none',
+                  scrollbarWidth: 'none',
+                }}
               >
-                <div className="flex flex-col items-center">
+                <div className={`flex flex-col items-center p-5 ${
+                  section.id === 'contact' ? 'px-6 py-4' : ''
+                }`}>
                   <Outlet />
                 </div>
               </div>

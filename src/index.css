@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -67,13 +68,16 @@
     scroll-behavior: smooth;
     height: 100%;
     overflow: hidden;
+    text-rendering: optimizeLegibility;
   }
   
+  /* Improved theme transition for better performance */
   .theme-transition,
   .theme-transition * {
-    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+    transition-property: color, background-color, border-color;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 300ms;
+    transition-duration: 150ms; /* Reduced for faster theme switching */
+    will-change: color, background-color, border-color;
   }
   
   body {
@@ -102,28 +106,102 @@
   text-wrap: balance;
 }
 
+/* Enhanced glass panel for menu and content */
 .glass-panel {
-  @apply bg-background/80 backdrop-blur-sm border border-border rounded-lg shadow-sm;
+  @apply bg-background/65 backdrop-blur-md border border-border/40 rounded-lg shadow-sm;
+  transition: all 0.18s cubic-bezier(0.3, 0, 0.2, 1);
+  animation: glass-fade-in 0.25s ease-out forwards;
+  transform: translateZ(0);
+  will-change: opacity, transform;
 }
 
+.dark .glass-panel {
+  @apply bg-background/50 border-white/10;
+}
+
+/* Glass animation keyframes with improved timing */
+@keyframes glass-fade-in {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0);
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(8px);
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Enhanced menu option animations */
 .nav-indicator {
-  @apply h-2 w-1.5 rounded-full bg-muted-foreground/40 transition-all duration-300;
+  @apply h-2 w-1.5 rounded-full bg-muted-foreground/40;
+  transition: all 0.22s cubic-bezier(0.25, 0.1, 0.25, 1);
+  will-change: width, background-color;
+  transform: translateZ(0);
 }
 
 .nav-indicator.active {
   @apply w-3 bg-primary;
+  animation: pulse-glow 1s ease-in-out infinite alternate;
+}
+
+@keyframes pulse-glow {
+  from {
+    box-shadow: 0 0 0px transparent;
+  }
+  to {
+    box-shadow: 0 0 4px rgba(var(--primary), 0.4);
+  }
+}
+
+.nav-text {
+  transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+  will-change: color, transform;
+  transform: translateZ(0);
+}
+
+.nav-text.active {
+  animation: text-pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes text-pop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .section-content {
   height: 0;
   overflow: hidden;
   opacity: 0;
-  transition: height 0.3s ease, opacity 0.3s ease;
+  transform: translateZ(0);
+  transition: height 0.25s cubic-bezier(0.4, 0, 0.2, 1), 
+              opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: height, opacity;
 }
 
 .section-content.active {
   height: auto;
   opacity: 1;
+}
+
+/* Menu glass panel with enhanced transitions */
+.menu-glass {
+  @apply bg-background/75 backdrop-blur-md border border-border/30 shadow-sm;
+  transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+  will-change: background-color, backdrop-filter;
+  transform: translateZ(0);
+}
+
+.dark .menu-glass {
+  @apply bg-background/40 border-white/10;
 }
 
 /* Hide scrollbars but keep scrolling functionality */
@@ -138,17 +216,59 @@
   display: none;  /* Chrome, Safari and Opera */
 }
 
-/* Splash screen styles */
-.absolute-center {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  width: 100%;
+/* Custom theme toggle button styles */
+.theme-toggle-btn {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
-/* Responsive styles */
+/* Content animation for smoother section transitions */
+.content-animation-enter {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.content-animation-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.25s ease-out, transform 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.content-animation-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.content-animation-exit-active {
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity 0.18s ease-in, transform 0.18s cubic-bezier(0.55, 0, 0.1, 1);
+}
+
+/* Better text rendering for Stack page */
+.stack-text {
+  text-rendering: optimizeLegibility;
+  font-smooth: always;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.01em;
+}
+
+.stack-item {
+  background: linear-gradient(to right, rgba(var(--secondary), 0.6), rgba(var(--secondary), 0.5));
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transform: translateZ(0);
+  will-change: transform;
+  transition: transform 0.2s ease;
+}
+
+.stack-item:hover {
+  transform: translateY(-1px) scale(1.01);
+}
+
+/* Mobile optimizations */
 @media (max-width: 768px) {
   .section-heading {
     @apply text-2xl;
@@ -159,14 +279,12 @@
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     padding-bottom: 5rem; /* Ensure content doesn't overlap with navigation */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
   
   .content-container::-webkit-scrollbar {
     display: none;
-  }
-  
-  .content-container {
-    scrollbar-width: none;
   }
   
   /* Ensure content is properly centered and doesn't overlap with UI elements */
@@ -177,34 +295,41 @@
   
   /* Improve tap targets for mobile */
   button {
-    min-height: 25px;
+    min-height: 40px;
     min-width: 40px;
+    padding: 0.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
   
-  /* Ensure theme toggle is easily tappable */
-  .theme-toggle {
-    touch-action: manipulation;
+  /* Optimize typography for mobile */
+  p, li, span {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    letter-spacing: -0.01em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Stack specific styles for mobile */
+  .stack-item {
+    @apply font-medium antialiased text-sm;
+    letter-spacing: -0.01em;
+  }
+  
+  /* Reduce motion for users who prefer it */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
-/* Font face declarations */
-/* @font-face {
-  font-family: 'Inter var';
-  font-weight: 100 900;
-  font-display: swap;
-  font-style: normal;
-  font-named-instance: 'Regular';
-  src: url('https://rsms.me/inter/font-files/Inter-roman.var.woff2?v=3.19') format('woff2');
-}
-
-@font-face {
-  font-family: 'Inter var';
-  font-weight: 100 900;
-  font-display: swap;
-  font-style: italic;
-  font-named-instance: 'Italic';
-  src: url('https://rsms.me/inter/font-files/Inter-italic.var.woff2?v=3.19') format('woff2');
-} */
+/* Rest of the existing font declarations */
+/* ... keep existing code (font face declarations) */
