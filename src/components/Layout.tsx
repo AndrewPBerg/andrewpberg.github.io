@@ -66,21 +66,12 @@ const Layout = () => {
   }, [activeSection, isAnimating, isMobile, navigate]);
   
   const toggleTheme = useCallback(() => {
-    // Use requestAnimationFrame for smoother theme transitions
-    requestAnimationFrame(() => {
-      document.body.classList.add('theme-transition');
-      
-      // Use requestAnimationFrame for the theme change
-      requestAnimationFrame(() => {
-        setTheme(theme === 'dark' ? 'light' : 'dark');
-        
-        // Remove the transition class after animation completes
-        setTimeout(() => {
-          document.body.classList.remove('theme-transition');
-        }, 300);
-      });
-    });
-  }, [theme, setTheme]);
+    document.body.classList.add('theme-transition');
+    setTheme(prevTheme => prevTheme === 'dark' ? 'light' : 'dark');
+    setTimeout(() => {
+      document.body.classList.remove('theme-transition');
+    }, 200);
+  }, [setTheme]);
   
   // Update active section based on URL
   useEffect(() => {
@@ -182,10 +173,10 @@ const Layout = () => {
     };
   }, [activeSection, previousSection, isMobile]);
   
-  // Isolated topology effect to prevent re-renders
+  // Memoize topology effect with theme dependency
   const topologyEffect = useMemo(() => (
-    <TopologyEffect activeSection={memoizedActiveSection} />
-  ), [memoizedActiveSection]);
+    <TopologyEffect key={`topology-${theme}`} activeSection={memoizedActiveSection} />
+  ), [memoizedActiveSection, theme]);
   
   return (
     <div className="min-h-screen flex flex-col p-4 md:p-8">

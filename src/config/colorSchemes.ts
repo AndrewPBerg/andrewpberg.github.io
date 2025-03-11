@@ -23,19 +23,19 @@ export interface ColorSchemes {
 const colorSchemes: ColorSchemes = {
   dark: {
     info: {
-      background: 0x000000,
+      background: 0x1f1f1f,
       foreground: 0x4a8bff, // Brighter Blue
     },
     contact: {
-      background: 0x000000,
+      background: 0x1f1f1f,
       foreground: 0xff2e2e, // Brighter Red
     },
     stack: {
-      background: 0x000000,
+      background: 0x1f1f1f,
       foreground: 0x05ff48, // Brighter Green
     },
     projects: {
-      background: 0x000000,
+      background: 0x1f1f1f,
       foreground: 0xae00ff, // Brighter Purple
     },
   },

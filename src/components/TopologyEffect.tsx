@@ -3,21 +3,17 @@ import { useTheme } from '../hooks/useTheme';
 import TOPOLOGY from './vanta/topology.js';
 import colorSchemes from '../config/colorSchemes';
 
-// Import p5.js dynamically to avoid SSR issues
 let p5: any = null;
 
 interface TopologyEffectProps {
   activeSection: string;
 }
 
-// Use memo to prevent unnecessary re-renders
 const TopologyEffect = memo(({ activeSection = 'info' }: TopologyEffectProps) => {
   const { theme } = useTheme();
   const vantaRef = useRef<HTMLDivElement>(null);
   const vantaEffectRef = useRef<any>(null);
   const [p5Loaded, setP5Loaded] = useState(false);
-  const prevThemeRef = useRef(theme);
-  const prevSectionRef = useRef(activeSection);
   
   // Load p5.js dynamically
   useEffect(() => {
@@ -28,7 +24,6 @@ const TopologyEffect = memo(({ activeSection = 'info' }: TopologyEffectProps) =>
       });
     }
     
-    // Cleanup function
     return () => {
       if (vantaEffectRef.current) {
         vantaEffectRef.current.destroy();
@@ -37,20 +32,23 @@ const TopologyEffect = memo(({ activeSection = 'info' }: TopologyEffectProps) =>
     };
   }, []);
 
-  // Initialize or update the effect
+  // Handle effect initialization and updates
   useEffect(() => {
     if (!vantaRef.current || !p5Loaded) return;
-    
-    // Get colors based on theme and active section
+
     const themeColors = colorSchemes[theme as 'dark' | 'light'];
     const sectionColors = themeColors[activeSection as keyof typeof themeColors] || themeColors.info;
     
     const backgroundColor = sectionColors.background;
     const foregroundColor = sectionColors.foreground;
 
-    // If effect doesn't exist, create it
-    if (!vantaEffectRef.current) {
-      try {
+    const updateEffect = () => {
+      if (vantaEffectRef.current) {
+        vantaEffectRef.current.setOptions({
+          color: foregroundColor,
+          backgroundColor: backgroundColor
+        });
+      } else {
         vantaEffectRef.current = TOPOLOGY({
           el: vantaRef.current,
           p5: p5,
@@ -74,47 +72,32 @@ const TopologyEffect = memo(({ activeSection = 'info' }: TopologyEffectProps) =>
           pulseIntensity: 0,
           pulseSpeed: 0,
           offset: 100,
-          
         });
-      } catch (error) {
-        console.error("Failed to initialize topology effect:", error);
       }
-    } 
-    // If effect exists and theme or section changed, just update colors
-    else if (theme !== prevThemeRef.current || activeSection !== prevSectionRef.current) {
-      try {
-        // Update only the color properties, not recreating the entire effect
-        vantaEffectRef.current.setOptions({
-          color: foregroundColor,
-          backgroundColor: backgroundColor
-        });
-      } catch (error) {
-        console.error("Failed to update topology effect:", error);
-      }
-    }
+    };
 
-    // Update refs with current values
-    prevThemeRef.current = theme;
-    prevSectionRef.current = activeSection;
-    
+    // Use RAF to ensure smooth color transitions
+    if (typeof window !== 'undefined') {
+      window.requestAnimationFrame(updateEffect);
+    }
   }, [p5Loaded, theme, activeSection]);
 
   return (
     <div 
       ref={vantaRef} 
-      className="fixed top-0 left-0 w-full h-full -z-10 opacity-60 will-change-transform" // Increased opacity
+      className="fixed top-0 left-0 w-full h-full -z-10 opacity-60 will-change-transform"
       aria-hidden="true"
       style={{ 
         transform: 'translate3d(0,0,0)',
         backfaceVisibility: 'hidden',
-        mixBlendMode: 'normal', // Normal blend for clarity
-        filter: 'contrast(1.4) brightness(1.5)' // Reduced filter intensity
+        mixBlendMode: 'normal',
+        filter: 'contrast(1.4) brightness(1.5)',
+        transition: 'background-color 0.2s ease-out'
       }}
     />
   );
 });
 
-// Add display name for debugging
 TopologyEffect.displayName = 'TopologyEffect';
 
 export { TopologyEffect };

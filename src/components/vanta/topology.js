@@ -18,6 +18,19 @@ class Effect extends P5Base {
     p5 = userOptions.p5 || p5
     super(userOptions)
   }
+
+  setOptions(opts) {
+    super.setOptions(opts)
+    if (opts.backgroundColor !== undefined) {
+      this.setBgColor(opts.backgroundColor)
+    }
+    if (this.p5renderer) {
+      if (opts.color !== undefined) {
+        this.options.color = opts.color
+      }
+    }
+  }
+
   onInit() {
     const t = this
 
