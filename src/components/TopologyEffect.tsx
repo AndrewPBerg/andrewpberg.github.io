@@ -107,12 +107,12 @@ const TopologyEffect = memo(({ activeSection = 'info' }: TopologyEffectProps) =>
           scaleMobile: 0.8,
           color: foregroundColor,
           backgroundColor: backgroundColor,
-          speed: isMobile ? 1.5 : 1.8, // Increased speed for both mobile and desktop
+          speed: 2, // Increased speed for both mobile and desktop
           particleCount: particleCount,
           particleSize: particleSize,
           flowCellSize: isMobile ? 10 : 8, // Smaller flow cells for faster movement
           noiseSize: noiseSize,
-          noiseRadius: 0.12, // Increased noise radius
+          noiseRadius: 0.5, // Increased noise radius
           colorMode: 'variance',
           colorVariance: 0.25,
           pulseIntensity: 0,

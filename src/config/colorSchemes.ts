@@ -43,7 +43,7 @@ const colorSchemes: ColorSchemes = {
   light: {
     info: {
       background: 0xffffff,
-      foreground: 0x4a5568, // Dark gray
+      foreground: 0x00ff00, // Green
     },
     contact: {
       background: 0xffffff,
@@ -51,11 +51,11 @@ const colorSchemes: ColorSchemes = {
     },
     stack: {
       background: 0xffffff,
-      foreground: 0xe2e8f0, // Light gray
+      foreground: 0x006400, // Dark green
     },
     projects: {
       background: 0xffffff,
-      foreground: 0x63b3ed, // Medium light blue
+      foreground: 0xeb34de, // Pink
     },
   },
 };

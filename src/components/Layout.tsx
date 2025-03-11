@@ -53,7 +53,7 @@ const Layout = () => {
       
       exitTl.to(currentContentRef, {
         opacity: 0,
-        y: -3,
+        y: isMobile ? 0 : -3,
       });
     } else {
       navigate(`/${id}`);
@@ -127,7 +127,7 @@ const Layout = () => {
     
     gsap.set(activeContentRef, { 
       opacity: 0, 
-      y: 3,
+      y: isMobile ? 0 : 3,
       display: 'block'
     });
     
@@ -229,7 +229,7 @@ const Layout = () => {
         <>
           <div className="fixed bottom-6 left-0 right-0 z-50">
             <div className="flex flex-row justify-center mx-auto">
-              <div className="menu-glass py-3 px-6 rounded-full shadow-md flex items-center gap-8 border border-border/30"
+              <div className="menu-glass py-2 px-3 rounded-full shadow-md flex items-center gap-4 border border-border/30"
                    style={{ transform: 'translateZ(0)' }}>
                 {sections.map((section) => (
                   <button
@@ -267,24 +267,20 @@ const Layout = () => {
               <div 
                 key={section.id}
                 ref={el => contentRefs.current[section.id] = el}
-                className={`content-container glass-panel fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 will-change-transform ${
+                className={`content-container glass-panel fixed z-40 will-change-transform ${
                   section.id === 'contact' 
                     ? 'w-auto max-w-[85vw]'
-                    : 'w-full max-w-[90vw]'
+                    : 'w-[90vw]'
                 }`}
                 style={{ 
-                  opacity: 0, 
-                  transform: 'translate3d(-50%, -50%, 0)',
-                  maxHeight: '70vh',
+                  opacity: 0,
                   overflowY: 'auto',
                   WebkitOverflowScrolling: 'touch',
                   msOverflowStyle: 'none',
-                  scrollbarWidth: 'none',
+                  scrollbarWidth: 'none'
                 }}
               >
-                <div className={`flex flex-col items-center p-5 ${
-                  section.id === 'contact' ? 'px-6 py-4' : ''
-                }`}>
+                <div className="flex flex-col items-center p-4">
                   <Outlet />
                 </div>
               </div>
