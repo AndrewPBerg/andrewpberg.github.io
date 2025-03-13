@@ -5,7 +5,7 @@ const Info = () => {
   const contentRef = useRef<HTMLDivElement>(null);
   
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 antialiased will-change-transform">
       <div ref={contentRef} className="space-y-4">
 
         <h2 className="text-base font-large font-display  mb-1 antialiased will-change-transform">

@@ -149,7 +149,7 @@ const Projects = () => {
   };
   
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 antialiased will-change-transform">
       <p className="text-xs text-muted-foreground mb-4">
         Projects are updated as I see fit. Some are open-source, some are not. <br />
         Listed by importance.
@@ -162,7 +162,7 @@ const Projects = () => {
               key={project.id} 
               className="group relative"
             >
-              <h3 className="text-base font-medium font-display mb-1 antialiased will-change-transform">{project.title}</h3>
+              <h3 className="text-base font-medium font-display mb-1 will-change-transform">{project.title}</h3>
               <p className="text-xs text-muted-foreground mb-2">{project.dateRange}</p>
               <p className="mt-1 text-xs text-foreground/90">{project.description}</p>
               

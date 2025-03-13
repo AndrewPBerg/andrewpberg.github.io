@@ -54,7 +54,7 @@ class Effect extends P5Base {
         //display_flow()
         update_particles()
         display_particles()
-        tick += 0.002
+        tick += 0.005
       }
 
       function init_particles() {

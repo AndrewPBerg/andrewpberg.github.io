@@ -87,9 +87,9 @@ const TopologyEffect = memo(({ activeSection = 'info' }: TopologyEffectProps) =>
 
     // Mobile optimizations
     const particleCount = isMobile ? 2500 : 4000;
-    const particleSize = isMobile ? 0.8 : 1.0;
-    const noiseSize = isMobile ? 0.005 : 0.004;
-    const scale = isMobile ? 0.8 : 1.0;
+    const particleSize = isMobile ? 0.5 : 1.0;
+    const noiseSize = isMobile ? 0.001 : 0.01;
+    const scale = isMobile ? 0.5 : 1.0;
 
     // If effect doesn't exist, create it with optimized settings
     if (!vantaEffectRef.current) {
@@ -100,8 +100,8 @@ const TopologyEffect = memo(({ activeSection = 'info' }: TopologyEffectProps) =>
           mouseControls: false, 
           touchControls: false,  
           gyroControls: false,
-          minHeight: 100.00,
-          minWidth: 100.00,
+          minHeight: 0.00,
+          minWidth: 0.00,
           scale: scale,
           scaleMobile: 0.8,
           color: foregroundColor,

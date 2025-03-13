@@ -54,7 +54,7 @@ const Stack = () => {
   ]);
 
   return (
-    <div className="space-y-4 will-change-transform">
+    <div className="space-y-4 will-change-transform antialiased">
       {skills.map((skill) => (
         <div key={skill.name} className="pt-2">
           <h3 className="text-base font-medium font-display mb-1  antialiased will-change-transform" 

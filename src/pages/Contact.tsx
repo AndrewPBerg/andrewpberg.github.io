@@ -6,7 +6,7 @@ const Contact = () => {
   const contentRef = useRef<HTMLDivElement>(null);
   
   return (
-    <div className="space-y-3 max-w-[250px]">
+    <div className="space-y-3 max-w-[250px] antialiased will-change-transform">
       <div ref={contentRef}>
         <p className="text-xs text-muted-foreground mb-3 antialiased">
           Always looking for new projects. <br />
