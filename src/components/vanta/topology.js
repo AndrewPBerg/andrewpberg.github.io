@@ -29,7 +29,7 @@ class Effect extends P5Base {
       let flow_cell_size = 10
 
       let noise_size = 0.003
-      let noise_radius = 0.1
+      let noise_radius = 0.15
 
       let flow_width = (width + offset * 2) / flow_cell_size
       let flow_height = (height + offset * 2) / flow_cell_size
@@ -37,8 +37,9 @@ class Effect extends P5Base {
       let noise_grid = []
       let flow_grid = []
 
-      let number_of_particles = 4500
+      let number_of_particles = t.options.particleCount || 4500
       let particles = []
+      let pulse = 0
 
       let tick = 0
       p.setup = function() {
@@ -74,6 +75,8 @@ class Effect extends P5Base {
       }
 
       function update_particles() {
+        pulse = Math.sin(tick * t.options.pulseSpeed) * t.options.pulseIntensity
+        
         for (let i = 0; i < number_of_particles; i++) {
           let prt = particles[i]
           let flow = get_flow(prt.pos.x, prt.pos.y)
@@ -81,15 +84,20 @@ class Effect extends P5Base {
           prt.prev.x = prt.pos.x
           prt.prev.y = prt.pos.y
 
-          prt.pos.x = mod(prt.pos.x + prt.vel.x, p.width + 2 * offset)
-          prt.pos.y = mod(prt.pos.y + prt.vel.y, p.height + 2 * offset)
+          let angle = p.noise(prt.seed * 0.01, tick) * p.TAU
+          let circularMotion = p.createVector(
+            p.cos(angle) * 0.2,
+            p.sin(angle) * 0.2
+          )
+
+          prt.pos.x = mod(prt.pos.x + prt.vel.x + circularMotion.x, p.width + 2 * offset)
+          prt.pos.y = mod(prt.pos.y + prt.vel.y + circularMotion.y, p.height + 2 * offset)
 
           prt.vel
             .add(prt.acc)
             .normalize()
-            .mult(2.2)
+            .mult(2.2 + pulse)
 
-          //prt.acc = p5.Vector.fromAngle(p.noise(prt.seed * 10, tick) * p.TAU).mult(0.01)
           prt.acc = p.createVector(0, 0)
           prt.acc.add(flow).mult(3)
         }
@@ -142,13 +150,20 @@ class Effect extends P5Base {
       }
 
       function display_particles() {
-        p.strokeWeight(1)
-        // 255, 240, 220
-        p.stroke(color2Rgb(t.options.color, 0.05))
+        p.strokeWeight(t.options.particleSize || 1)
+        
         for (let i = 0; i < particles.length; i++) {
-          //p.stroke(particles[i].col)
-          //p.point(particles[i].pos.x, particles[i].pos.y)
-          if (p5.Vector.dist(particles[i].prev, particles[i].pos) < 10)
+          let alpha = 0.05 + pulse * 0.02
+          let particleColor = color2Rgb(t.options.color, alpha)
+          
+          if (t.options.colorMode === 'variance') {
+            let variance = (p.noise(particles[i].seed * 0.1, tick) - 0.5) * t.options.colorVariance
+            particleColor = color2Rgb(t.options.color, alpha, variance)
+          }
+          
+          p.stroke(particleColor)
+          
+          if (p5.Vector.dist(particles[i].prev, particles[i].pos) < 12)
             p.line(particles[i].prev.x, particles[i].prev.y, particles[i].pos.x, particles[i].pos.y)
         }
       }

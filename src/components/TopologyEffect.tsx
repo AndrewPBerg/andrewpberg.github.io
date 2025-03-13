@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState, memo } from 'react';
 import { useTheme } from '../hooks/useTheme';
 import TOPOLOGY from './vanta/topology.js';
@@ -87,9 +86,9 @@ const TopologyEffect = memo(({ activeSection = 'info' }: TopologyEffectProps) =>
     console.log(`Colors: bg=${backgroundColor.toString(16)}, fg=${foregroundColor.toString(16)}`);
 
     // Mobile optimizations
-    const particleCount = isMobile ? 2000 : 3500;
-    const particleSize = isMobile ? 1.0 : 1.2;
-    const noiseSize = isMobile ? 0.006 : 0.005; // Increased noise size for faster movement
+    const particleCount = isMobile ? 2500 : 4000;
+    const particleSize = isMobile ? 0.8 : 1.0;
+    const noiseSize = isMobile ? 0.005 : 0.004;
     const scale = isMobile ? 0.8 : 1.0;
 
     // If effect doesn't exist, create it with optimized settings
@@ -107,17 +106,17 @@ const TopologyEffect = memo(({ activeSection = 'info' }: TopologyEffectProps) =>
           scaleMobile: 0.8,
           color: foregroundColor,
           backgroundColor: backgroundColor,
-          speed: 2, // Increased speed for both mobile and desktop
+          speed: 2.5,
           particleCount: particleCount,
           particleSize: particleSize,
-          flowCellSize: isMobile ? 10 : 8, // Smaller flow cells for faster movement
+          flowCellSize: isMobile ? 12 : 10,
           noiseSize: noiseSize,
-          noiseRadius: 0.5, // Increased noise radius
+          noiseRadius: 0.15,
           colorMode: 'variance',
-          colorVariance: 0.25,
-          pulseIntensity: 0,
-          pulseSpeed: 0,
-          offset: 100,
+          colorVariance: 0.35,
+          pulseIntensity: 0.05,
+          pulseSpeed: 0.5,
+          offset: 1.2,
         });
         console.log('Topology effect initialized successfully');
       } catch (error) {
