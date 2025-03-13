@@ -21,7 +21,7 @@ const Layout = () => {
   const contentRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const buttonRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const tlRef = useRef<gsap.core.Timeline | null>(null);
-  const { theme, setTheme } = useTheme();
+  const { theme } = useTheme();
   const isMobile = useIsMobile();
   
   const memoizedActiveSection = useMemo(() => activeSection, [activeSection]);
@@ -31,53 +31,22 @@ const Layout = () => {
     
     setIsAnimating(true);
     
-    const currentContentRef = contentRefs.current[activeSection];
-    
-    if (currentContentRef) {
-      if (tlRef.current) {
-        tlRef.current.kill();
+    // Hide previous section content immediately on mobile
+    if (isMobile && previousSection) {
+      const prevContentRef = contentRefs.current[previousSection];
+      if (prevContentRef) {
+        prevContentRef.style.display = 'none';
       }
-      
-      const exitTl = gsap.timeline({
-        defaults: {
-          ease: "power1.in",
-          duration: isMobile ? 0.1 : 0.15,
-          force3D: true,
-        },
-        onComplete: () => {
-          navigate(`/${id}`);
-        }
-      });
-      
-      tlRef.current = exitTl;
-      
-      exitTl.to(currentContentRef, {
-        opacity: 0,
-        y: isMobile ? 0 : -3,
-      });
-    } else {
-      navigate(`/${id}`);
-      setIsAnimating(false);
     }
-  }, [activeSection, isAnimating, isMobile, navigate]);
-  
-  const toggleTheme = useCallback(() => {
-    // Compute the new theme value directly
-    const newTheme = theme === 'dark' ? 'light' : 'dark';
     
-    // Apply the theme transition
-    requestAnimationFrame(() => {
-      document.documentElement.classList.add('theme-transition');
-      
-      // Set the theme using the direct value approach
-      setTheme(newTheme);
-      
-      // Remove the transition class after the change is complete
-      setTimeout(() => {
-        document.documentElement.classList.remove('theme-transition');
-      }, 200);
-    });
-  }, [theme, setTheme]);
+    // Use minimal GSAP animation for content transition
+    navigate(`/${id}`);
+    
+    // Reset animation state after a minimal delay
+    setTimeout(() => {
+      setIsAnimating(false);
+    }, 300);
+  }, [activeSection, isAnimating, navigate, previousSection, isMobile]);
   
   useEffect(() => {
     const path = location.pathname.slice(1) || 'info';
@@ -91,9 +60,7 @@ const Layout = () => {
     const activeButtonRef = buttonRefs.current[activeSection];
     
     if (activeButtonRef) {
-      const glowColor = theme === 'dark'
-        ? 'rgba(200, 200, 200, 0.5)'
-        : 'rgba(80, 80, 80, 0.3)';
+      const glowColor = 'rgba(200, 200, 200, 0.5)';
       
       activeButtonRef.style.boxShadow = `0 0 6px 1px ${glowColor}`;
       
@@ -103,54 +70,59 @@ const Layout = () => {
         }
       };
     }
-  }, [activeSection, theme]);
+  }, [activeSection]);
   
+  // Simplified content transition using CSS instead of GSAP
   useEffect(() => {
     const activeContentRef = contentRefs.current[activeSection];
     if (!activeContentRef) return;
     
-    if (tlRef.current) {
-      tlRef.current.kill();
-    }
+    // Hide all other sections first (important for mobile)
+    Object.entries(contentRefs.current).forEach(([id, ref]) => {
+      if (id !== activeSection && ref) {
+        ref.style.display = 'none';
+        ref.style.opacity = '0';
+      }
+    });
     
     if (!previousSection) {
-      gsap.set(activeContentRef, { opacity: 1, y: 0 });
+      activeContentRef.style.opacity = '1';
+      activeContentRef.style.transform = 'translateY(0px)';
+      activeContentRef.style.display = 'block';
       return;
     }
     
     setIsAnimating(true);
     
-    const tl = gsap.timeline({
-      defaults: {
-        ease: "power2.out",
-        duration: 0.2,
-        force3D: true,
-      },
-      onComplete: () => {
-        setIsAnimating(false);
-      }
-    });
+    // Use CSS transitions instead of GSAP for better performance
+    activeContentRef.style.opacity = '0';
+    activeContentRef.style.transform = isMobile ? 'translateY(0px)' : 'translateY(3px)';
+    activeContentRef.style.display = 'block';
     
-    tlRef.current = tl;
+    // Force reflow to ensure transition works
+    void activeContentRef.offsetWidth;
     
-    gsap.set(activeContentRef, { 
-      opacity: 0, 
-      y: isMobile ? 0 : 3,
-      display: 'block'
-    });
+    // Apply transition
+    activeContentRef.style.opacity = '1';
+    activeContentRef.style.transform = 'translateY(0px)';
     
-    tl.to(activeContentRef, { 
-      opacity: 1, 
-      y: 0,
-    });
+    // Clear animation state after transition
+    const transitionEndHandler = () => {
+      setIsAnimating(false);
+    };
+    
+    activeContentRef.addEventListener('transitionend', transitionEndHandler);
+    
+    // Fallback in case transition event doesn't fire
+    const timeoutId = setTimeout(transitionEndHandler, 300);
     
     return () => {
-      if (tlRef.current) {
-        tlRef.current.kill();
-      }
+      activeContentRef.removeEventListener('transitionend', transitionEndHandler);
+      clearTimeout(timeoutId);
     };
   }, [activeSection, previousSection, isMobile]);
   
+  // Memoize the topology effect to prevent rerenders
   const topologyEffect = useMemo(() => (
     <TopologyEffect activeSection={memoizedActiveSection} />
   ), [memoizedActiveSection]);
@@ -158,33 +130,6 @@ const Layout = () => {
   return (
     <div className="min-h-screen flex flex-col p-4 md:p-8">
       {topologyEffect}
-      
-      <div className={`fixed ${isMobile ? 'top-6 right-6' : 'top-6 right-6'} z-50`}>
-        <button
-          onClick={toggleTheme}
-          className={`theme-toggle-btn glass-panel group flex items-center gap-2 px-3 py-2 rounded-full border transition-all duration-200 will-change-transform ${
-            theme === 'dark' 
-              ? 'bg-background/40 border-primary/20 hover:bg-background/60' 
-              : 'bg-background/60 border-border hover:bg-background/80'
-          }`}
-          aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-          style={{ transform: 'translateZ(0)' }}
-        >
-          <div className="relative w-10 h-5 flex items-center rounded-full transition-colors duration-200 bg-gradient-to-r from-muted to-muted/70 p-0.5">
-            <div 
-              className={`absolute w-4 h-4 rounded-full transition-all duration-200 shadow-sm will-change-transform ${
-                theme === 'dark' 
-                  ? 'translate-x-5 bg-primary' 
-                  : 'translate-x-0 bg-background'
-              }`}
-              style={{ transform: `translateZ(0) translateX(${theme === 'dark' ? '20px' : '0px'})` }}
-            />
-          </div>
-          <span className="text-xs font-medium tracking-wider">
-            {theme === 'dark' ? 'DARK' : 'LIGHT'}
-          </span>
-        </button>
-      </div>
       
       {!isMobile && (
         <div className="fixed right-8 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-4 items-end">
@@ -219,8 +164,8 @@ const Layout = () => {
                 {section.id === activeSection && (
                   <div 
                     ref={el => contentRefs.current[section.id] = el}
-                    className="content-container glass-panel mt-6 w-80 pr-6 will-change-transform"
-                    style={{ opacity: 0, transform: 'translateZ(0)' }}
+                    className="content-container glass-panel mt-6 w-80 pr-6 will-change-transform transition-all duration-300"
+                    style={{ opacity: 0, transform: 'translateZ(0)', display: 'block' }}
                   >
                     <div className="p-4">
                       <Outlet />
@@ -250,17 +195,16 @@ const Layout = () => {
                   >
                     <div 
                       ref={el => buttonRefs.current[section.id] = el}
-                      className={`relative flex items-center justify-center h-3.5 w-3.5 rounded-full transition-colors duration-200 ${
+                      className={`relative h-2.5 w-2.5 rounded-full transition-colors duration-200 ${
                         section.id === activeSection 
                           ? 'bg-primary' 
                           : 'bg-muted-foreground/40 group-hover:bg-muted-foreground/70'
-                      }`} 
-                      style={{ transform: 'translateZ(0)' }}
+                      }`}
                     />
-                    <span className={`text-xs font-medium tracking-wide transition-colors duration-200 ${
+                    <span className={`text-xs tracking-wide transition-colors duration-200 ${
                       section.id === activeSection 
-                        ? 'text-primary font-semibold' 
-                        : 'text-muted-foreground/70 group-hover:text-muted-foreground'
+                        ? 'text-primary font-medium' 
+                        : 'text-muted-foreground group-hover:text-muted-foreground/80'
                     }`}>
                       {section.title}
                     </span>
@@ -270,30 +214,22 @@ const Layout = () => {
             </div>
           </div>
           
-          {sections.map((section) => (
-            section.id === activeSection && (
+          <div className="p-4 sm:p-6 md:p-8 w-full pb-24">
+            {sections.map((section) => (
               <div 
                 key={section.id}
                 ref={el => contentRefs.current[section.id] = el}
-                className={`content-container glass-panel fixed z-40 will-change-transform ${
-                  section.id === 'contact' 
-                    ? 'w-auto max-w-[85vw]'
-                    : 'w-[90vw]'
-                }`}
+                className={`content-container glass-panel p-4 w-full mb-4 will-change-transform transition-all duration-300`}
                 style={{ 
-                  opacity: 0,
-                  overflowY: 'auto',
-                  WebkitOverflowScrolling: 'touch',
-                  msOverflowStyle: 'none',
-                  scrollbarWidth: 'none'
+                  opacity: 0, 
+                  transform: 'translateZ(0)', 
+                  display: section.id === activeSection ? 'block' : 'none'
                 }}
               >
-                <div className="flex flex-col items-center p-4">
-                  <Outlet />
-                </div>
+                {<Outlet />}
               </div>
-            )
-          ))}
+            ))}
+          </div>
         </>
       )}
     </div>

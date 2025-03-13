@@ -14,14 +14,15 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
   useEffect(() => {
     if (!containerRef.current || !textRef.current || !overlayRef.current) return;
     
-    // Initial state setup
+    // Initial state setup - simpler than before
     gsap.set(containerRef.current, { autoAlpha: 1 });
-    gsap.set(textRef.current, { autoAlpha: 0, y: 5 }); // Smaller movement
+    gsap.set(textRef.current, { autoAlpha: 0, y: 3 });
     gsap.set(overlayRef.current, { scaleX: 0, transformOrigin: "left" });
     
+    // Create a simplified timeline with fewer animations
     const tl = gsap.timeline({
       onComplete: () => {
-        // Exit animation
+        // Simplified exit animation
         const exitTl = gsap.timeline({
           onComplete: () => {
             setIsVisible(false);
@@ -29,47 +30,38 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
           }
         });
         
+        // Quicker fade out
         exitTl.to(textRef.current, {
           autoAlpha: 0,
-          y: -5, // Smaller movement
-          duration: 0.25,
-          ease: "power2.in"
+          y: -3,
+          duration: 0.2,
+          ease: "power1.in"
         })
         .to(overlayRef.current, {
           scaleX: 0,
           transformOrigin: "right",
-          duration: 0.5,
-          ease: "power2.inOut"
+          duration: 0.3,
+          ease: "power1.inOut"
         });
       }
     });
     
-    // Clean, Apple-inspired animation sequence
+    // Simplified animation sequence
     tl.to(overlayRef.current, {
       scaleX: 1,
-      duration: 0.6,
-      ease: "power2.inOut"
+      duration: 0.4, // Reduced duration
+      ease: "power1.inOut"
     })
     .to(textRef.current, {
       autoAlpha: 1,
       y: 0,
-      duration: 0.4,
-      ease: "power2.out"
-    })
-    .to(textRef.current, {
-      scale: 1.02, // Smaller scale effect
-      duration: 0.2,
-      ease: "power2.out"
-    })
-    .to(textRef.current, {
-      scale: 1,
-      duration: 0.2,
-      ease: "power2.in"
+      duration: 0.3, // Reduced duration
+      ease: "power1.out"
     });
     
-    // Ensure total duration is about 2 seconds
-    if (tl.duration() > 1.6) {
-      tl.timeScale(tl.duration() / 1.6);
+    // Ensure total duration is about 1 second (faster than before)
+    if (tl.duration() > 1) {
+      tl.timeScale(tl.duration() / 1);
     }
     
     return () => {

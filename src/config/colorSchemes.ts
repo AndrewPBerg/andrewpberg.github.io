@@ -29,7 +29,7 @@ const colorSchemes: ColorSchemes = {
     },
     contact: {
       background: 0x000000,
-      foreground: 0xdcdcdc, // Light grey
+      foreground: 0x6a0dad, // Dark purple
     },
     stack: {
       background: 0x000000,

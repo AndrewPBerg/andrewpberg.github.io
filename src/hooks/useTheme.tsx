@@ -1,13 +1,13 @@
-
 import { createContext, useContext, useEffect, useState } from "react";
 
 type Theme = "dark" | "light" | "system";
 
-type ThemeProviderProps = {
+interface ThemeProviderProps {
   children: React.ReactNode;
   defaultTheme?: Theme;
   storageKey?: string;
-};
+  forcedTheme?: Theme;
+}
 
 type ThemeProviderState = {
   theme: Theme;
@@ -25,6 +25,7 @@ export function ThemeProvider({
   children,
   defaultTheme = "dark",
   storageKey = "theme",
+  forcedTheme,
   ...props
 }: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(
@@ -59,6 +60,12 @@ export function ThemeProvider({
       });
     };
     
+    // If forcedTheme is provided, use it
+    if (forcedTheme) {
+      applyTheme(forcedTheme);
+      return;
+    }
+    
     if (theme === "system") {
       const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
         ? "dark"
@@ -68,11 +75,11 @@ export function ThemeProvider({
     } else {
       applyTheme(theme);
     }
-  }, [theme]);
+  }, [theme, forcedTheme]);
 
   // Optimized system theme change listener
   useEffect(() => {
-    if (theme !== 'system') return;
+    if (theme !== 'system' || forcedTheme) return;
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     
@@ -103,11 +110,12 @@ export function ThemeProvider({
     // Use the modern event listener approach
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
-  }, [theme]);
+  }, [theme, forcedTheme]);
 
   const value = {
-    theme,
+    theme: forcedTheme || theme,
     setTheme: (newTheme: Theme) => {
+      if (forcedTheme) return;
       // Store theme in localStorage and update state in one pass
       localStorage.setItem(storageKey, newTheme);
       setTheme(newTheme);

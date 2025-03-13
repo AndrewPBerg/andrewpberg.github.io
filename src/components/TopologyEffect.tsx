@@ -5,7 +5,7 @@ import colorSchemes from '../config/colorSchemes';
 import * as THREE from 'three';
 import { useIsMobile } from '../hooks/use-mobile';
 
-// Import p5.js dynamically to avoid SSR issues
+// Lazy load p5.js to improve initial load time
 let p5: any = null;
 
 interface TopologyEffectProps {
@@ -22,18 +22,18 @@ const TopologyEffect = memo(({ activeSection = 'info' }: TopologyEffectProps) =>
   const prevThemeRef = useRef(theme);
   const prevSectionRef = useRef(activeSection);
   
-  // Load p5.js dynamically with optimized loading
+  // Load p5.js dynamically with optimized loading only when needed
   useEffect(() => {
     let isMounted = true;
     
     if (typeof window !== 'undefined' && !p5) {
-      // Add THREE to window for VANTA before p5 is loaded
+      // Add THREE to window for VANTA
       (window as any).THREE = THREE;
       
-      // Optimized async loading
+      // Optimized async loading with error handling
       const loadP5 = async () => {
         try {
-          const p5Module = await import('p5');
+          const p5Module = await import(/* webpackChunkName: "p5" */ 'p5');
           if (isMounted) {
             p5 = p5Module.default;
             setP5Loaded(true);
@@ -59,11 +59,9 @@ const TopologyEffect = memo(({ activeSection = 'info' }: TopologyEffectProps) =>
     };
   }, []);
 
-  // Force effect recreation when theme changes
+  // Only destroy and recreate effect when theme changes
   useEffect(() => {
-    // If theme changed, destroy current effect so it can be recreated
     if (theme !== prevThemeRef.current && vantaEffectRef.current) {
-      console.log('Theme changed, destroying effect to recreate');
       vantaEffectRef.current.destroy();
       vantaEffectRef.current = null;
     }
@@ -71,7 +69,7 @@ const TopologyEffect = memo(({ activeSection = 'info' }: TopologyEffectProps) =>
     prevThemeRef.current = theme;
   }, [theme]);
 
-  // Initialize or update the effect with optimized settings for mobile
+  // Initialize or update the effect with greatly optimized settings
   useEffect(() => {
     if (!vantaRef.current || !p5Loaded) return;
     
@@ -82,16 +80,13 @@ const TopologyEffect = memo(({ activeSection = 'info' }: TopologyEffectProps) =>
     const backgroundColor = sectionColors.background;
     const foregroundColor = sectionColors.foreground;
 
-    console.log(`Initializing topology effect: theme=${theme}, section=${activeSection}`);
-    console.log(`Colors: bg=${backgroundColor.toString(16)}, fg=${foregroundColor.toString(16)}`);
-
-    // Mobile optimizations
-    const particleCount = isMobile ? 2500 : 4000;
+    // Significantly reduced particle count for better performance
+    const particleCount = isMobile ? 1500 : 2500;
     const particleSize = isMobile ? 0.5 : 1.0;
-    const noiseSize = isMobile ? 0.001 : 0.01;
+    const noiseSize = isMobile ? 0.001 : 0.004;
     const scale = isMobile ? 0.5 : 1.0;
 
-    // If effect doesn't exist, create it with optimized settings
+    // Only create new effect if it doesn't exist
     if (!vantaEffectRef.current) {
       try {
         vantaEffectRef.current = TOPOLOGY({
@@ -106,19 +101,18 @@ const TopologyEffect = memo(({ activeSection = 'info' }: TopologyEffectProps) =>
           scaleMobile: 0.8,
           color: foregroundColor,
           backgroundColor: backgroundColor,
-          speed: 2.5,
+          speed: 2.0, // Reduced speed for better performance
           particleCount: particleCount,
           particleSize: particleSize,
-          flowCellSize: isMobile ? 12 : 10,
+          flowCellSize: isMobile ? 14 : 12, // Increased cell size for fewer calculations
           noiseSize: noiseSize,
           noiseRadius: 0.15,
           colorMode: 'variance',
           colorVariance: 0.35,
           pulseIntensity: 0.05,
-          pulseSpeed: 0.5,
+          pulseSpeed: 0.4, // Slightly reduced for performance
           offset: 1.2,
         });
-        console.log('Topology effect initialized successfully');
       } catch (error) {
         console.error("Failed to initialize topology effect:", error);
       }
@@ -126,7 +120,6 @@ const TopologyEffect = memo(({ activeSection = 'info' }: TopologyEffectProps) =>
     // If effect exists and section changed, just update colors
     else if (activeSection !== prevSectionRef.current) {
       try {
-        console.log('Section changed, updating colors');
         // Update only the color properties, not recreating the entire effect
         vantaEffectRef.current.setOptions({
           color: foregroundColor,
@@ -145,13 +138,13 @@ const TopologyEffect = memo(({ activeSection = 'info' }: TopologyEffectProps) =>
   return (
     <div 
       ref={vantaRef} 
-      className="fixed top-0 left-0 w-full h-full -z-10 opacity-65 will-change-transform" 
+      className="fixed top-0 left-0 w-full h-full -z-10 opacity-70 will-change-transform" 
       aria-hidden="true"
       style={{ 
         transform: 'translate3d(0,0,0)',
         backfaceVisibility: 'hidden',
         mixBlendMode: 'normal',
-        filter: isMobile ? 'contrast(1.3) brightness(1.4)' : 'contrast(1.5) brightness(1.6)',
+        filter: isMobile ? 'contrast(1.2) brightness(1.3)' : 'contrast(1.4) brightness(1.5)',
         padding: '56px',
       }}
     />
