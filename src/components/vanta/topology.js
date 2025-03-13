@@ -24,10 +24,9 @@ class Effect extends P5Base {
     let sketch = function(p) {
       let width = t.width
       let height = t.height
-      let offset = 100
+      let offset = 0
 
       let flow_cell_size = 10
-
       let noise_size = 0.003
       let noise_radius = 0.15
 
@@ -39,9 +38,8 @@ class Effect extends P5Base {
 
       let number_of_particles = t.options.particleCount || 4500
       let particles = []
-      let pulse = 0
-
       let tick = 0
+
       p.setup = function() {
         t.initP5(p) // sets bg too
         p.smooth()
@@ -61,26 +59,45 @@ class Effect extends P5Base {
 
       function init_particles() {
         for (let i = 0; i < number_of_particles; i++) {
-          let r = p.random(p.width + 2 * offset)
-          let q = p.random(p.height + 2 * offset)
+          let r = p.random(p.width)
+          let q = p.random(p.height)
           particles.push({
             prev: p.createVector(r, q),
             pos: p.createVector(r, q),
             vel: p.createVector(0, 0),
             acc: p.createVector(0, 0),
-            col: p.random(255),
-            seed: i
+            seed: i,
+            life: p.random(0.8, 1)
           })
         }
       }
 
       function update_particles() {
-        pulse = Math.sin(tick * t.options.pulseSpeed) * t.options.pulseIntensity
-        
         for (let i = 0; i < number_of_particles; i++) {
           let prt = particles[i]
-          let flow = get_flow(prt.pos.x, prt.pos.y)
+          
+          prt.life -= 0.001
+          if (prt.life <= 0 || 
+              prt.pos.x < 0 || prt.pos.x > p.width ||
+              prt.pos.y < 0 || prt.pos.y > p.height) {
+              
+            if (p.random() > 0.5) {
+              prt.pos.x = p.random() > 0.5 ? 0 : p.width
+              prt.pos.y = p.random(p.height)
+            } else {
+              prt.pos.x = p.random(p.width)
+              prt.pos.y = p.random() > 0.5 ? 0 : p.height
+            }
+            
+            prt.prev.x = prt.pos.x
+            prt.prev.y = prt.pos.y
+            prt.vel = p.createVector(0, 0)
+            prt.acc = p.createVector(0, 0)
+            prt.life = p.random(0.8, 1)
+            continue
+          }
 
+          let flow = get_flow(prt.pos.x, prt.pos.y)
           prt.prev.x = prt.pos.x
           prt.prev.y = prt.pos.y
 
@@ -90,13 +107,13 @@ class Effect extends P5Base {
             p.sin(angle) * 0.2
           )
 
-          prt.pos.x = mod(prt.pos.x + prt.vel.x + circularMotion.x, p.width + 2 * offset)
-          prt.pos.y = mod(prt.pos.y + prt.vel.y + circularMotion.y, p.height + 2 * offset)
+          prt.pos.x += prt.vel.x + circularMotion.x
+          prt.pos.y += prt.vel.y + circularMotion.y
 
           prt.vel
             .add(prt.acc)
             .normalize()
-            .mult(2.2 + pulse)
+            .mult(2.5)
 
           prt.acc = p.createVector(0, 0)
           prt.acc.add(flow).mult(3)
@@ -144,27 +161,23 @@ class Effect extends P5Base {
       }
 
       function get_flow(xpos, ypos) {
-        xpos = p.constrain(xpos, 0, p.width + offset * 2)
-        ypos = p.constrain(ypos, 0, p.height + offset * 2)
-        return flow_grid[p.floor(ypos / flow_cell_size)][p.floor(xpos / flow_cell_size)]
+        xpos = p.constrain(xpos, -offset, p.width + offset)
+        ypos = p.constrain(ypos, -offset, p.height + offset)
+        let flowX = p.floor((xpos + offset) / flow_cell_size)
+        let flowY = p.floor((ypos + offset) / flow_cell_size)
+        flowX = p.constrain(flowX, 0, flow_grid[0].length - 1)
+        flowY = p.constrain(flowY, 0, flow_grid.length - 1)
+        return flow_grid[flowY][flowX]
       }
 
       function display_particles() {
         p.strokeWeight(t.options.particleSize || 1)
         
         for (let i = 0; i < particles.length; i++) {
-          let alpha = 0.05 + pulse * 0.02
+          let alpha = 0.05 * particles[i].life
           let particleColor = color2Rgb(t.options.color, alpha)
-          
-          if (t.options.colorMode === 'variance') {
-            let variance = (p.noise(particles[i].seed * 0.1, tick) - 0.5) * t.options.colorVariance
-            particleColor = color2Rgb(t.options.color, alpha, variance)
-          }
-          
           p.stroke(particleColor)
-          
-          if (p5.Vector.dist(particles[i].prev, particles[i].pos) < 12)
-            p.line(particles[i].prev.x, particles[i].prev.y, particles[i].pos.x, particles[i].pos.y)
+          p.line(particles[i].prev.x, particles[i].prev.y, particles[i].pos.x, particles[i].pos.y)
         }
       }
 
