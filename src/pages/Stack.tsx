@@ -57,7 +57,7 @@ const Stack = () => {
     <div className="space-y-4 will-change-transform">
       {skills.map((skill) => (
         <div key={skill.name} className="pt-2">
-          <h3 className="text-xs font-medium tracking-wide mb-2 text-foreground font-sans antialiased will-change-transform" 
+          <h3 className="text-base font-medium font-display mb-1  antialiased will-change-transform" 
               style={{ fontSmooth: 'always', textRendering: 'optimizeLegibility' }}>
             {skill.name}
           </h3>

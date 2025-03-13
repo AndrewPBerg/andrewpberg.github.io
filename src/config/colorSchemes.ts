@@ -55,7 +55,7 @@ const colorSchemes: ColorSchemes = {
     },
     projects: {
       background: 0xffffff,
-      foreground: 0xeb34de, // Pink
+      foreground: 0xc71585, // Darker pink
     },
   },
 };

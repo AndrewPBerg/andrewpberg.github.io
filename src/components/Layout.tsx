@@ -62,9 +62,17 @@ const Layout = () => {
   }, [activeSection, isAnimating, isMobile, navigate]);
   
   const toggleTheme = useCallback(() => {
+    // Compute the new theme value directly
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    
+    // Apply the theme transition
     requestAnimationFrame(() => {
       document.documentElement.classList.add('theme-transition');
-      setTheme(theme === 'dark' ? 'light' : 'dark');
+      
+      // Set the theme using the direct value approach
+      setTheme(newTheme);
+      
+      // Remove the transition class after the change is complete
       setTimeout(() => {
         document.documentElement.classList.remove('theme-transition');
       }, 200);

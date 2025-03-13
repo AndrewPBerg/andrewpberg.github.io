@@ -8,7 +8,7 @@ const Info = () => {
     <div className="space-y-4">
       <div ref={contentRef} className="space-y-4">
 
-        <h2 className="text-m  text-secondary-foreground font-medium antialiased  text-bold">
+        <h2 className="text-base font-large font-display  mb-1 antialiased will-change-transform">
           AI & Full-Stack Developer
         </h2>
         

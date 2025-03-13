@@ -47,7 +47,7 @@ const projects = [
     tags: ['Python', 'GoogleAI', 'Spring Boot', 'Django'],
     dateRange: 'Nov 2024 - Dec 2024',
     links: {
-      github: 'https://github.com/AndrewPBeratings-prediction',
+      github: 'https://github.com/AndrewPBerg/Dope_Dictionary',
       website: null,
       paper: null
     }
@@ -162,7 +162,7 @@ const Projects = () => {
               key={project.id} 
               className="group relative"
             >
-              <h3 className="text-base font-medium font-display mb-1">{project.title}</h3>
+              <h3 className="text-base font-medium font-display mb-1 antialiased will-change-transform">{project.title}</h3>
               <p className="text-xs text-muted-foreground mb-2">{project.dateRange}</p>
               <p className="mt-1 text-xs text-foreground/90">{project.description}</p>
               
