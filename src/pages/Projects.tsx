@@ -18,13 +18,13 @@ const projects = [
   },
   {
     id: 'project2',
-    title: 'DNS Fuzzing',
-    description: 'Domain monitoring and secutiry analysis tool. Currently under private development.',
-    tags: ['Python', 'React', 'Docker', 'Pub/Sub', 'MySQL'],
-    dateRange: 'Jan 2025 - Present',
+    title: 'Fuzzify',
+    description: 'Domain impersonation analysis tool. Submitted for Senior Capstone Project',
+    tags: ['Full-Stack', 'Python', 'React', 'Docker', 'Pub/Sub', 'MySQL'],
+    dateRange: 'Jan 2025 - Apr 2025',
     links: {
-      github: null,
-      website: null,
+      github: 'https://github.com/AndrewPBerg/Fuzzify',
+      website: 'https://fuzzify-jade.vercel.app/',
       paper: null
     }
   },
