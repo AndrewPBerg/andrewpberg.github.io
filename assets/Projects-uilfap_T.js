@@ -1,4 +1,4 @@
-import{j as e}from"./ui-C-Ze-hZF.js";import{r as t}from"./vendor-X99H2SLW.js";import{g as r}from"./animation-CwgPdEP7.js";import{G as s}from"./github-C4Ovk1Ae.js";import{c as i}from"./index-BX_1ahvQ.js";
+import{j as e}from"./ui-C-Ze-hZF.js";import{r as t}from"./vendor-X99H2SLW.js";import{g as r}from"./animation-CwgPdEP7.js";import{G as s}from"./github-ByzwCYN9.js";import{c as i}from"./index-BsknQfN_.js";
 /**
  * @license lucide-react v0.462.0 - ISC
  *
