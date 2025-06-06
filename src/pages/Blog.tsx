@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Calendar, Clock, Tag, Sun, Moon } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, Tag, Sun, Moon, Copy, Check } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { Components } from 'react-markdown';
@@ -203,11 +203,42 @@ const markdownComponents: Components = {
       </code>
     );
   },
-  pre: ({ children, ...props }) => (
-    <pre className="bg-muted border border-border rounded-lg p-3 sm:p-4 mb-3 sm:mb-4 overflow-x-auto text-xs sm:text-sm" {...props}>
-      {children}
-    </pre>
-  ),
+  pre: ({ children, ...props }) => {
+    const [copied, setCopied] = useState(false);
+    
+    const copyToClipboard = async () => {
+      try {
+        // Extract text content from the code element
+        const codeElement = (children as any)?.props?.children;
+        const textContent = typeof codeElement === 'string' ? codeElement : codeElement?.toString() || '';
+        
+        await navigator.clipboard.writeText(textContent);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch (err) {
+        console.error('Failed to copy text: ', err);
+      }
+    };
+
+    return (
+      <div className="relative group">
+        <pre className="bg-muted border border-border rounded-lg p-3 sm:p-4 mb-3 sm:mb-4 overflow-x-auto text-xs sm:text-sm" {...props}>
+          {children}
+        </pre>
+        <button
+          onClick={copyToClipboard}
+          className="absolute top-2 right-2 p-2 rounded-md bg-background/80 border border-border/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-background/90 hover:border-border"
+          aria-label="Copy code"
+        >
+          {copied ? (
+            <Check className="w-4 h-4 text-green-500" />
+          ) : (
+            <Copy className="w-4 h-4 text-muted-foreground hover:text-foreground" />
+          )}
+        </button>
+      </div>
+    );
+  },
   blockquote: ({ children, ...props }) => (
     <blockquote className="border-l-4 border-primary pl-3 sm:pl-4 my-3 sm:my-4 italic text-sm sm:text-base text-muted-foreground" {...props}>
       {children}
