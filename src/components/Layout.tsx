@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { useNavigate, useLocation, Outlet } from 'react-router-dom';
+import { useNavigate, useLocation, Outlet, Link } from 'react-router-dom';
 import gsap from 'gsap';
 import { useTheme } from '../hooks/useTheme';
 import { useIsMobile } from '../hooks/use-mobile';
 import { TopologyEffect } from './TopologyEffect';
+import { ExternalLink } from 'lucide-react';
 
 const sections = [
   { id: 'info', title: 'Info' },
@@ -134,6 +135,15 @@ const Layout = () => {
       
       {!isMobile && (
         <div className="fixed right-8 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-4 items-end">
+          {/* Blog Link Button */}
+          <Link 
+            to="/blog"
+            className="group flex items-center gap-2 px-3 py-2 bg-primary/10 hover:bg-primary/20 border border-primary/20 hover:border-primary/40 rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-primary/20"
+          >
+            <span className="text-xs font-medium text-primary">Blog</span>
+            <ExternalLink className="w-3 h-3 text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300" />
+          </Link>
+          
           <div className="flex flex-col gap-6 items-end">
             {sections.map((section) => (
               <div key={section.id} className="relative">
@@ -181,6 +191,17 @@ const Layout = () => {
       
       {isMobile && (
         <>
+          {/* Mobile Blog Link Button */}
+          <div className="fixed top-6 right-6 z-50">
+            <Link 
+              to="/blog"
+              className="group flex items-center gap-2 px-3 py-2 bg-primary/10 hover:bg-primary/20 border border-primary/20 hover:border-primary/40 rounded-lg transition-all duration-300 backdrop-blur-sm"
+            >
+              <span className="text-xs font-medium text-primary">Blog</span>
+              <ExternalLink className="w-3 h-3 text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300" />
+            </Link>
+          </div>
+          
           <div className="fixed bottom-6 left-0 right-0 z-50">
             <div className="flex flex-row justify-center mx-auto">
               <div className="menu-glass py-2 px-3 rounded-full shadow-md flex items-center gap-4 border border-border/30"

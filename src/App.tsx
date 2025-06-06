@@ -14,6 +14,7 @@ const Projects = lazy(() => import("./pages/Projects"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Stack = lazy(() => import("./pages/Stack"));
 const Publications = lazy(() => import("./pages/Publications"));
+const Blog = lazy(() => import("./pages/Blog"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Create QueryClient with optimized settings
@@ -58,6 +59,7 @@ const App = () => {
                     <Route path="stack" element={<Stack />} />
                     <Route path="publications" element={<Publications />} />
                   </Route>
+                  <Route path="/blog" element={<Blog />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>
