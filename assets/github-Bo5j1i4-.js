@@ -1,4 +1,4 @@
-import{c}from"./index-BsknQfN_.js";
+import{c}from"./index-C-q7ifpn.js";
 /**
  * @license lucide-react v0.462.0 - ISC
  *
