@@ -6,7 +6,7 @@ const Publications = () => {
   
   const publications = [
     {
-      title: "Advanced Machine Learning Techniques",
+      title: " 4,500 Seconds: Small Data Training Approaches for Deep UAV Audio Classification",
       authors: "Berg, Zhang, Wang",
       venue: "Intl. Conf. on  DATA Science, Technology, and Applications",
       year: "2025",
