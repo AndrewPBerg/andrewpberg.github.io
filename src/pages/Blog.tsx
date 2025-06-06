@@ -77,10 +77,37 @@ const extractMetadata = (fileMetadata: any): BlogPost => {
   // Parse tags
   const tags = metadata.tags ? metadata.tags.split(',').map(tag => tag.trim()) : [];
   
-  // Extract excerpt from first paragraph after title and metadata
-  const contentStart = lines.findIndex(line => line.startsWith('# ')) + 1;
-  const firstParagraph = lines.slice(contentStart).find(line => 
-    line.trim() && !line.startsWith('*') && !line.startsWith('#') && !line.includes(':')
+  // Remove metadata lines from content for rendering
+  const cleanedLines = [];
+  let metadataSectionEnded = false;
+  
+  for (const line of lines) {
+    const trimmedLine = line.trim();
+    
+    // Skip metadata lines at the beginning
+    if (!metadataSectionEnded) {
+      // If we hit a title or empty line, metadata section has ended
+      if (trimmedLine.startsWith('#') || (trimmedLine === '' && cleanedLines.length === 0)) {
+        metadataSectionEnded = true;
+      }
+      // Skip lines that look like metadata (key: value)
+      else if (trimmedLine.match(/^[^:]+:\s*.+$/)) {
+        continue;
+      }
+    }
+    
+    // Add line to cleaned content once metadata section has ended
+    if (metadataSectionEnded) {
+      cleanedLines.push(line);
+    }
+  }
+  
+  const cleanedContent = cleanedLines.join('\n');
+  
+  // Extract excerpt from first paragraph after title
+  const contentStart = cleanedLines.findIndex(line => line.startsWith('# ')) + 1;
+  const firstParagraph = cleanedLines.slice(contentStart).find(line => 
+    line.trim() && !line.startsWith('*') && !line.startsWith('#')
   );
   const excerpt = firstParagraph?.substring(0, 150) + '...' || 'No excerpt available';
   
@@ -91,7 +118,7 @@ const extractMetadata = (fileMetadata: any): BlogPost => {
     date,
     readTime: readingTime,
     slug: filename.replace('.md', ''),
-    content,
+    content: cleanedContent,
     tags,
     rawDate
   };
