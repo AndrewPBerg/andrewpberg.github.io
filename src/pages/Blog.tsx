@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Calendar, Clock, Tag, Sun, Moon, Copy, Check } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, Tag, Sun, Moon, Copy, Check, Filter, ChevronDown } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { Components } from 'react-markdown';
@@ -18,6 +18,9 @@ interface BlogPost {
   tags: string[];
   rawDate: Date;
 }
+
+// Sorting options
+type SortOption = 'date-desc' | 'date-asc' | 'alpha-asc' | 'alpha-desc';
 
 // Function to parse metadata from markdown content
 const parseMetadata = (content: string) => {
@@ -252,9 +255,13 @@ const markdownComponents: Components = {
 const Blog = () => {
   const [mounted, setMounted] = useState(false);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [filteredPosts, setFilteredPosts] = useState<BlogPost[]>([]);
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
   const [blogTheme, setBlogTheme] = useState<'light' | 'dark'>('dark');
+  const [sortBy, setSortBy] = useState<SortOption>('date-desc');
+  const [selectedTag, setSelectedTag] = useState<string>('all');
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
 
   // Load theme from localStorage on mount
   useEffect(() => {
@@ -270,6 +277,43 @@ const Blog = () => {
     setBlogTheme(newTheme);
     localStorage.setItem('blog-theme', newTheme);
   };
+
+  // Sort and filter posts
+  useEffect(() => {
+    let filtered = [...blogPosts];
+
+    // Filter by tag
+    if (selectedTag !== 'all') {
+      filtered = filtered.filter(post => post.tags.includes(selectedTag));
+    }
+
+    // Sort posts
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'date-desc':
+          return b.rawDate.getTime() - a.rawDate.getTime();
+        case 'date-asc':
+          return a.rawDate.getTime() - b.rawDate.getTime();
+        case 'alpha-asc':
+          return a.title.localeCompare(b.title);
+        case 'alpha-desc':
+          return b.title.localeCompare(a.title);
+        default:
+          return b.rawDate.getTime() - a.rawDate.getTime();
+      }
+    });
+
+    setFilteredPosts(filtered);
+  }, [blogPosts, sortBy, selectedTag]);
+
+  // Extract available tags when posts are loaded
+  useEffect(() => {
+    const tags = new Set<string>();
+    blogPosts.forEach(post => {
+      post.tags.forEach(tag => tags.add(tag));
+    });
+    setAvailableTags(Array.from(tags).sort());
+  }, [blogPosts]);
 
   useEffect(() => {
     // Clean up any existing VANTA effects when blog mounts
@@ -494,6 +538,76 @@ const Blog = () => {
           </p>
         </div>
 
+        {/* Filters */}
+        {!loading && blogPosts.length > 0 && (
+          <div className="max-w-4xl mx-auto mb-8 sm:mb-10">
+            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Filter className={`w-4 h-4 ${blogTheme === 'light' ? 'text-gray-600' : 'text-muted-foreground'}`} />
+                <span className={`text-sm font-medium ${blogTheme === 'light' ? 'text-gray-900' : 'text-foreground'}`}>
+                  Filters:
+                </span>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                {/* Sort By Filter */}
+                <div className="relative">
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value as SortOption)}
+                    className={`appearance-none bg-transparent border rounded-md px-3 py-2 pr-8 text-sm cursor-pointer transition-colors ${
+                      blogTheme === 'light'
+                        ? 'border-gray-300 text-gray-900 hover:border-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20'
+                        : 'border-border text-foreground hover:border-border/80 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20'
+                    }`}
+                  >
+                    <option value="date-desc">Newest First</option>
+                    <option value="date-asc">Oldest First</option>
+                    <option value="alpha-asc">A-Z</option>
+                    <option value="alpha-desc">Z-A</option>
+                  </select>
+                  <ChevronDown className={`absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none ${
+                    blogTheme === 'light' ? 'text-gray-600' : 'text-muted-foreground'
+                  }`} />
+                </div>
+
+                {/* Tag Filter */}
+                {availableTags.length > 0 && (
+                  <div className="relative">
+                    <select
+                      value={selectedTag}
+                      onChange={(e) => setSelectedTag(e.target.value)}
+                      className={`appearance-none bg-transparent border rounded-md px-3 py-2 pr-8 text-sm cursor-pointer transition-colors min-w-[120px] ${
+                        blogTheme === 'light'
+                          ? 'border-gray-300 text-gray-900 hover:border-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20'
+                          : 'border-border text-foreground hover:border-border/80 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20'
+                      }`}
+                    >
+                      <option value="all">All Tags</option>
+                      {availableTags.map((tag) => (
+                        <option key={tag} value={tag}>
+                          {tag}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className={`absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none ${
+                      blogTheme === 'light' ? 'text-gray-600' : 'text-muted-foreground'
+                    }`} />
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Results count */}
+            <div className={`mt-4 text-sm ${blogTheme === 'light' ? 'text-gray-600' : 'text-muted-foreground'}`}>
+              Showing {filteredPosts.length} of {blogPosts.length} post{blogPosts.length !== 1 ? 's' : ''}
+              {selectedTag !== 'all' && (
+                <span> • Filtered by tag: <span className="font-medium">{selectedTag}</span></span>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Blog Posts Grid */}
         <div className="max-w-4xl mx-auto">
           {loading ? (
@@ -502,7 +616,7 @@ const Blog = () => {
             </div>
           ) : (
             <div className="grid gap-6 sm:gap-8 md:gap-12">
-              {blogPosts.map((post) => (
+              {filteredPosts.map((post) => (
                 <article 
                   key={post.id}
                   className="group cursor-pointer"
@@ -576,6 +690,37 @@ const Blog = () => {
                   </div>
                 </article>
               ))}
+            </div>
+          )}
+
+          {/* Message if no posts match filters */}
+          {!loading && filteredPosts.length === 0 && blogPosts.length > 0 && (
+            <div className="mt-12 sm:mt-16 text-center">
+              <div className={`border border-dashed rounded-lg p-6 sm:p-8 md:p-12 ${
+                blogTheme === 'light' ? 'border-gray-300' : 'border-border/50'
+              }`}>
+                <h3 className={`text-lg sm:text-xl font-display font-medium mb-3 sm:mb-4 ${
+                  blogTheme === 'light' ? 'text-gray-900' : 'text-foreground'
+                }`}>No Posts Match Your Filters</h3>
+                <p className={`text-sm sm:text-base mb-4 sm:mb-6 ${
+                  blogTheme === 'light' ? 'text-gray-600' : 'text-muted-foreground'
+                }`}>
+                  Try adjusting your filters to see more posts.
+                </p>
+                <button
+                  onClick={() => {
+                    setSortBy('date-desc');
+                    setSelectedTag('all');
+                  }}
+                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-md border transition-colors text-sm ${
+                    blogTheme === 'light'
+                      ? 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                      : 'border-border text-muted-foreground hover:bg-muted'
+                  }`}
+                >
+                  Reset Filters
+                </button>
+              </div>
             </div>
           )}
 
