@@ -144,37 +144,37 @@ const loadMarkdownFiles = async (): Promise<BlogPost[]> => {
 // Custom components for ReactMarkdown to ensure proper styling
 const markdownComponents: Components = {
   h1: ({ children, ...props }) => (
-    <h1 className="text-4xl font-display font-bold mb-6 text-foreground" {...props}>
+    <h1 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold mb-4 sm:mb-6 text-foreground" {...props}>
       {children}
     </h1>
   ),
   h2: ({ children, ...props }) => (
-    <h2 className="text-2xl font-display font-semibold mb-4 mt-8 text-foreground" {...props}>
+    <h2 className="text-xl sm:text-2xl font-display font-semibold mb-3 sm:mb-4 mt-6 sm:mt-8 text-foreground" {...props}>
       {children}
     </h2>
   ),
   h3: ({ children, ...props }) => (
-    <h3 className="text-xl font-display font-semibold mb-3 mt-6 text-foreground" {...props}>
+    <h3 className="text-lg sm:text-xl font-display font-semibold mb-2 sm:mb-3 mt-4 sm:mt-6 text-foreground" {...props}>
       {children}
     </h3>
   ),
   p: ({ children, ...props }) => (
-    <p className="mb-4 text-muted-foreground leading-relaxed" {...props}>
+    <p className="mb-3 sm:mb-4 text-sm sm:text-base text-muted-foreground leading-relaxed" {...props}>
       {children}
     </p>
   ),
   ul: ({ children, ...props }) => (
-    <ul className="mb-4 ml-6 list-disc space-y-2" {...props}>
+    <ul className="mb-3 sm:mb-4 ml-4 sm:ml-6 list-disc space-y-1 sm:space-y-2" {...props}>
       {children}
     </ul>
   ),
   ol: ({ children, ...props }) => (
-    <ol className="mb-4 ml-6 list-decimal space-y-2" {...props}>
+    <ol className="mb-3 sm:mb-4 ml-4 sm:ml-6 list-decimal space-y-1 sm:space-y-2" {...props}>
       {children}
     </ol>
   ),
   li: ({ children, ...props }) => (
-    <li className="text-muted-foreground" {...props}>
+    <li className="text-sm sm:text-base text-muted-foreground" {...props}>
       {children}
     </li>
   ),
@@ -192,7 +192,7 @@ const markdownComponents: Components = {
     const isInline = !className;
     if (isInline) {
       return (
-        <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono text-foreground" {...props}>
+        <code className="bg-muted px-1 sm:px-1.5 py-0.5 rounded text-xs sm:text-sm font-mono text-foreground" {...props}>
           {children}
         </code>
       );
@@ -204,17 +204,17 @@ const markdownComponents: Components = {
     );
   },
   pre: ({ children, ...props }) => (
-    <pre className="bg-muted border border-border rounded-lg p-4 mb-4 overflow-x-auto" {...props}>
+    <pre className="bg-muted border border-border rounded-lg p-3 sm:p-4 mb-3 sm:mb-4 overflow-x-auto text-xs sm:text-sm" {...props}>
       {children}
     </pre>
   ),
   blockquote: ({ children, ...props }) => (
-    <blockquote className="border-l-4 border-primary pl-4 my-4 italic text-muted-foreground" {...props}>
+    <blockquote className="border-l-4 border-primary pl-3 sm:pl-4 my-3 sm:my-4 italic text-sm sm:text-base text-muted-foreground" {...props}>
       {children}
     </blockquote>
   ),
   hr: ({ ...props }) => (
-    <hr className="my-8 border-border" {...props} />
+    <hr className="my-6 sm:my-8 border-border" {...props} />
   ),
 };
 
@@ -282,7 +282,7 @@ const Blog = () => {
         
         {/* Header */}
         <header className="border-b border-border/50 bg-background/80 backdrop-blur-sm sticky top-0 z-50">
-          <div className="container mx-auto px-6 py-4">
+          <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
             <div className="flex items-center justify-between">
               <button 
                 onClick={() => setSelectedPost(null)}
@@ -302,11 +302,11 @@ const Blog = () => {
         </header>
 
         {/* Post Content */}
-        <main className="container mx-auto px-6 py-12 relative z-10">
-          <article className="max-w-4xl mx-auto">
+        <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 md:py-12 relative z-10">
+          <article className="max-w-none sm:max-w-3xl md:max-w-4xl mx-auto">
             {/* Post metadata */}
-            <div className="mb-8">
-              <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
+            <div className="mb-6 sm:mb-8">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-muted-foreground mb-4">
                 <div className="flex items-center gap-1">
                   <Calendar className="w-4 h-4" />
                   <span>{selectedPost.date}</span>
@@ -317,8 +317,8 @@ const Blog = () => {
                 </div>
               </div>
               {selectedPost.tags.length > 0 && (
-                <div className="flex items-center gap-2 mb-6">
-                  <Tag className="w-4 h-4 text-muted-foreground" />
+                <div className="flex items-start gap-2 mb-4 sm:mb-6">
+                  <Tag className="w-4 h-4 text-muted-foreground mt-0.5" />
                   <div className="flex flex-wrap gap-2">
                     {selectedPost.tags.map((tag, index) => (
                       <span 
@@ -333,7 +333,7 @@ const Blog = () => {
               )}
             </div>
             
-            <div className="prose prose-lg prose-slate dark:prose-invert max-w-none prose-headings:font-display prose-headings:font-bold prose-h1:text-4xl prose-h1:mb-6 prose-h2:text-2xl prose-h2:mb-4 prose-h3:text-xl prose-h3:mb-3 prose-p:mb-4 prose-ul:mb-4 prose-ol:mb-4 prose-li:mb-1 prose-code:bg-muted prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-muted prose-pre:border prose-pre:border-border">
+            <div className="prose prose-sm sm:prose-base md:prose-lg prose-slate dark:prose-invert max-w-none prose-headings:font-display prose-headings:font-bold prose-h1:text-2xl sm:prose-h1:text-3xl md:prose-h1:text-4xl prose-h1:mb-4 sm:prose-h1:mb-6 prose-h2:text-xl sm:prose-h2:text-2xl prose-h2:mb-3 sm:prose-h2:mb-4 prose-h3:text-lg sm:prose-h3:text-xl prose-h3:mb-2 sm:prose-h3:mb-3 prose-p:mb-3 sm:prose-p:mb-4 prose-ul:mb-3 sm:prose-ul:mb-4 prose-ol:mb-3 sm:prose-ol:mb-4 prose-li:mb-1 prose-code:bg-muted prose-code:px-1 sm:prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-pre:bg-muted prose-pre:border prose-pre:border-border prose-pre:text-xs sm:prose-pre:text-sm">
               <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
                 {selectedPost.content}
               </ReactMarkdown>
@@ -342,8 +342,8 @@ const Blog = () => {
         </main>
 
         {/* Footer */}
-        <footer className="border-t border-border/50 mt-20 relative z-10">
-          <div className="container mx-auto px-6 py-8">
+        <footer className="border-t border-border/50 mt-12 sm:mt-16 md:mt-20 relative z-10">
+          <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
             <div className="text-center text-sm text-muted-foreground">
               <p>&copy; 2024 Andrew P. Berg. All rights reserved.</p>
             </div>
@@ -360,7 +360,7 @@ const Blog = () => {
       
       {/* Header */}
       <header className="border-b border-border/50 bg-background/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-6 py-4">
+        <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
             <Link 
               to="/" 
@@ -375,13 +375,13 @@ const Blog = () => {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-6 py-12 relative z-10">
+      <main className="container mx-auto px-4 sm:px-6 py-8 sm:py-10 md:py-12 relative z-10">
         {/* Hero Section */}
-        <div className="max-w-3xl mx-auto text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-display font-bold mb-6">
+        <div className="max-w-3xl mx-auto text-center mb-10 sm:mb-12 md:mb-16">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold mb-4 sm:mb-6">
             Andrew P. Berg's Blog
           </h2>
-          <p className="text-lg text-muted-foreground leading-relaxed">
+          <p className="text-base sm:text-lg text-muted-foreground leading-relaxed px-2 sm:px-0">
             Informal posts about what I am learning/working on. 
           </p>
         </div>
@@ -389,31 +389,31 @@ const Blog = () => {
         {/* Blog Posts Grid */}
         <div className="max-w-4xl mx-auto">
           {loading ? (
-            <div className="text-center py-12">
+            <div className="text-center py-8 sm:py-12">
               <p className="text-muted-foreground">Loading blog posts...</p>
             </div>
           ) : (
-            <div className="grid gap-8 md:gap-12">
+            <div className="grid gap-6 sm:gap-8 md:gap-12">
               {blogPosts.map((post) => (
                 <article 
                   key={post.id}
                   className="group cursor-pointer"
                   onClick={() => setSelectedPost(post)}
                 >
-                  <div className="border border-border/50 rounded-lg p-6 md:p-8 hover:border-border transition-all duration-300 hover:shadow-lg bg-card/30 backdrop-blur-sm">
-                    <div className="flex items-start justify-between gap-4 mb-4">
+                  <div className="border border-border/50 rounded-lg p-4 sm:p-6 md:p-8 hover:border-border transition-all duration-300 hover:shadow-lg bg-card/30 backdrop-blur-sm">
+                    <div className="flex flex-col gap-3 sm:gap-4 mb-4">
                       <div className="flex-1">
-                        <h3 className="text-xl md:text-2xl font-display font-semibold mb-3 group-hover:text-primary transition-colors">
+                        <h3 className="text-lg sm:text-xl md:text-2xl font-display font-semibold mb-2 sm:mb-3 group-hover:text-primary transition-colors leading-tight">
                           {post.title}
                         </h3>
-                        <p className="text-muted-foreground leading-relaxed mb-4">
+                        <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-3 sm:mb-4">
                           {post.excerpt}
                         </p>
                       </div>
                     </div>
                     
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-muted-foreground">
                         <div className="flex items-center gap-1">
                           <Calendar className="w-4 h-4" />
                           <span>{post.date}</span>
@@ -425,8 +425,8 @@ const Blog = () => {
                       </div>
                       
                       {post.tags.length > 0 && (
-                        <div className="flex items-center gap-2">
-                          <Tag className="w-3 h-3 text-muted-foreground" />
+                        <div className="flex items-start gap-2">
+                          <Tag className="w-3 h-3 text-muted-foreground mt-0.5 sm:mt-0" />
                           <div className="flex flex-wrap gap-1">
                             {post.tags.slice(0, 3).map((tag, index) => (
                               <span 
@@ -453,10 +453,10 @@ const Blog = () => {
 
           {/* Message if no posts are loaded */}
           {!loading && blogPosts.length === 0 && (
-            <div className="mt-16 text-center">
-              <div className="border border-dashed border-border/50 rounded-lg p-8 md:p-12">
-                <h3 className="text-xl font-display font-medium mb-4">No Posts Found</h3>
-                <p className="text-muted-foreground mb-6">
+            <div className="mt-12 sm:mt-16 text-center">
+              <div className="border border-dashed border-border/50 rounded-lg p-6 sm:p-8 md:p-12">
+                <h3 className="text-lg sm:text-xl font-display font-medium mb-3 sm:mb-4">No Posts Found</h3>
+                <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6">
                   No markdown files were found in the src/md directory.
                 </p>
               </div>
@@ -466,8 +466,8 @@ const Blog = () => {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border/50 mt-20 relative z-10">
-        <div className="container mx-auto px-6 py-8">
+      <footer className="border-t border-border/50 mt-12 sm:mt-16 md:mt-20 relative z-10">
+        <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
           <div className="text-center text-sm text-muted-foreground">
             <p>&copy; 2024 Andrew P. Berg. All rights reserved.</p>
           </div>
