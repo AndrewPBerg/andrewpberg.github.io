@@ -1,6 +1,6 @@
 # From Concept to Code: My Development Journey
 
-*Published: January 10, 2024 • 7 min read*
+*Published: January 10, 2024*
 
 Every developer has a unique story of how they arrived at their current skills and perspective. This is mine—a journey through challenges, breakthroughs, and continuous learning.
 

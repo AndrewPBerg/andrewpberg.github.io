@@ -1,5 +1,7 @@
 # Testing Blog Post
 
+*Published: January 5, 2024*
+
 This is a test blog post to demonstrate the markdown-based blog system.
 
 ## Introduction
@@ -25,4 +27,3 @@ This is just a sample post to test the markdown rendering functionality.
 
 ---
 
-*Published: January 2024*

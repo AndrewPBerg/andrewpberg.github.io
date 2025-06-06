@@ -4,6 +4,7 @@ import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { Components } from 'react-markdown';
+import { calculateReadingTime } from '../lib/readingTime';
 
 // Interface for blog post metadata
 interface BlogPost {
@@ -21,13 +22,13 @@ const extractMetadata = (content: string, filename: string): BlogPost => {
   const lines = content.split('\n');
   const title = lines.find(line => line.startsWith('# '))?.replace('# ', '') || filename;
   
-  // Extract date and read time from the second line if it follows the pattern
-  const metaLine = lines.find(line => line.includes('Published:') && line.includes('min read'));
+  // Extract date from the metadata line if it exists
+  const metaLine = lines.find(line => line.includes('Published:'));
   const dateMatch = metaLine?.match(/Published: ([^•]+)/);
-  const readTimeMatch = metaLine?.match(/(\d+ min read)/);
-  
   const date = dateMatch ? dateMatch[1].trim() : new Date().toLocaleDateString();
-  const readTime = readTimeMatch ? readTimeMatch[1] : '5 min read';
+  
+  // Automatically calculate reading time based on content
+  const readTime = calculateReadingTime(content);
   
   // Extract excerpt from first paragraph after title
   const contentStart = lines.findIndex(line => line.startsWith('# ')) + 1;
@@ -76,11 +77,11 @@ This is just a sample post to test the markdown rendering functionality.
 
 ---
 
-*Published: January 2024*`,
+*Published: January 5, 2024*`,
 
   aiFullstack: `# Building the Future: AI and Full-Stack Development
 
-*Published: January 15, 2024 • 5 min read*
+*Published: January 15, 2024*
 
 Artificial intelligence is fundamentally transforming how we approach full-stack development, creating new paradigms and opportunities that were unimaginable just a few years ago.
 
@@ -134,7 +135,7 @@ The fusion of AI and full-stack development isn't just changing how we code—it
 
   developmentJourney: `# From Concept to Code: My Development Journey
 
-*Published: January 10, 2024 • 7 min read*
+*Published: January 10, 2024*
 
 Every developer has a unique story of how they arrived at their current skills and perspective. This is mine—a journey through challenges, breakthroughs, and continuous learning.
 

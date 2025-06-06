@@ -1,6 +1,6 @@
 # Building the Future: AI and Full-Stack Development
 
-*Published: January 15, 2024 • 5 min read*
+
 
 Artificial intelligence is fundamentally transforming how we approach full-stack development, creating new paradigms and opportunities that were unimaginable just a few years ago.
 
