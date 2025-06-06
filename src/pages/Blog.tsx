@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import type { Components } from 'react-markdown';
 
 // Interface for blog post metadata
 interface BlogPost {
@@ -46,30 +47,307 @@ const extractMetadata = (content: string, filename: string): BlogPost => {
   };
 };
 
-// Function to load markdown files using dynamic imports
+// Markdown content as constants
+const MARKDOWN_POSTS = {
+  testing: `# Testing Blog Post
+
+This is a test blog post to demonstrate the markdown-based blog system.
+
+## Introduction
+
+Welcome to this test post! This demonstrates how markdown files can be rendered in our React blog.
+
+## Features
+
+- **Markdown rendering**: Convert \`.md\` files to HTML
+- **Dynamic loading**: Load posts from the \`src/md\` directory
+- **Modern styling**: Beautiful typography with Tailwind CSS
+
+## Code Example
+
+\`\`\`javascript
+const greeting = "Hello, World!";
+console.log(greeting);
+\`\`\`
+
+## Conclusion
+
+This is just a sample post to test the markdown rendering functionality.
+
+---
+
+*Published: January 2024*`,
+
+  aiFullstack: `# Building the Future: AI and Full-Stack Development
+
+*Published: January 15, 2024 • 5 min read*
+
+Artificial intelligence is fundamentally transforming how we approach full-stack development, creating new paradigms and opportunities that were unimaginable just a few years ago.
+
+## The AI Revolution in Development
+
+The integration of AI tools into the development workflow has become more than just a trend—it's a fundamental shift in how we build software. From code generation to automated testing, AI is reshaping every aspect of the development lifecycle.
+
+### Key Areas of Impact
+
+1. **Code Generation**: AI-powered tools can now generate entire components and functions
+2. **Debugging Assistance**: Intelligent error detection and solution suggestions
+3. **Performance Optimization**: Automated analysis and improvement recommendations
+4. **Testing Automation**: Smart test case generation and execution
+
+## Modern Full-Stack Architecture
+
+Today's full-stack developers must navigate an increasingly complex landscape of technologies:
+
+\`\`\`typescript
+// Example: AI-assisted React component
+const AIComponent: React.FC<Props> = ({ data }) => {
+  const [insights, setInsights] = useState<AIInsights>();
+  
+  useEffect(() => {
+    analyzeData(data).then(setInsights);
+  }, [data]);
+  
+  return (
+    <div className="ai-component">
+      {insights && <InsightDisplay insights={insights} />}
+    </div>
+  );
+};
+\`\`\`
+
+## The Future Landscape
+
+As we look ahead, several trends are emerging:
+
+- **No-Code/Low-Code Evolution**: AI making development accessible to non-programmers
+- **Intelligent DevOps**: Automated deployment and scaling decisions
+- **Predictive Development**: AI anticipating and preventing issues before they occur
+
+## Conclusion
+
+The fusion of AI and full-stack development isn't just changing how we code—it's redefining what it means to be a developer in the modern era. Embracing these changes while maintaining core engineering principles will be key to success.
+
+---
+
+*Tags: AI, Full-Stack, Development, Future Tech*`,
+
+  developmentJourney: `# From Concept to Code: My Development Journey
+
+*Published: January 10, 2024 • 7 min read*
+
+Every developer has a unique story of how they arrived at their current skills and perspective. This is mine—a journey through challenges, breakthroughs, and continuous learning.
+
+## The Beginning
+
+My journey into development started not with code, but with curiosity. Like many developers, I was drawn to the idea of creating something from nothing, of building digital solutions to real-world problems.
+
+### First Steps
+
+The early days were marked by:
+
+- **Trial and Error**: Learning by breaking things and fixing them
+- **Documentation Deep Dives**: Spending hours reading MDN and Stack Overflow
+- **Project-Based Learning**: Building small projects to understand concepts
+
+## The Learning Curve
+
+### Frontend Foundations
+
+Starting with HTML, CSS, and JavaScript felt like learning a new language—which, of course, it was. The progression was gradual but rewarding:
+
+\`\`\`html
+<!-- My first "Hello World" -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My First Page</title>
+</head>
+<body>
+    <h1>Hello, World!</h1>
+    <script>
+        console.log("I'm a developer now!");
+    </script>
+</body>
+</html>
+\`\`\`
+
+### Backend Adventures
+
+Moving to backend development opened up new possibilities and challenges:
+
+- **Server Logic**: Understanding request-response cycles
+- **Database Design**: Learning relational and NoSQL concepts
+- **API Development**: Building robust, scalable endpoints
+
+## Key Milestones
+
+### The Framework Discovery
+
+Discovering React changed everything. The component-based architecture made sense, and suddenly complex UIs became manageable:
+
+\`\`\`jsx
+// The moment it clicked
+const MyFirstComponent = () => {
+  const [count, setCount] = useState(0);
+  
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={() => setCount(count + 1)}>
+        Increment
+      </button>
+    </div>
+  );
+};
+\`\`\`
+
+### Full-Stack Integration
+
+Learning to connect frontend and backend was like solving a complex puzzle. Each successful API call felt like a small victory.
+
+## Challenges and Growth
+
+### Common Obstacles
+
+1. **Impostor Syndrome**: Feeling like I didn't belong in the tech community
+2. **Technology Overload**: Too many frameworks, too little time
+3. **Debugging Nightmares**: Spending days on seemingly simple bugs
+
+### Lessons Learned
+
+- **Fundamentals Matter**: Strong basics make learning new technologies easier
+- **Community is Key**: Other developers are your greatest resource
+- **Practice, Practice, Practice**: There's no substitute for hands-on experience
+
+## Current Focus
+
+Today, my interests center around:
+
+- **Modern JavaScript/TypeScript**: Leveraging type safety and modern features
+- **React Ecosystem**: Exploring Next.js, state management, and testing
+- **AI Integration**: Incorporating AI tools to enhance development workflow
+
+## Looking Forward
+
+The journey continues with exciting developments on the horizon:
+
+- **Web3 Technologies**: Exploring blockchain and decentralized applications
+- **Edge Computing**: Understanding distributed systems and serverless architectures
+- **Developer Experience**: Building tools that make other developers' lives easier
+
+## Advice for New Developers
+
+If you're starting your journey, remember:
+
+1. **Be Patient**: Progress isn't always linear
+2. **Build Projects**: Portfolio beats certificates every time
+3. **Stay Curious**: Technology evolves rapidly—keep learning
+4. **Find Your Community**: Connect with other developers online and offline
+
+## Conclusion
+
+Development is more than just writing code—it's about solving problems, continuous learning, and building the future one line at a time. The journey is challenging but incredibly rewarding.
+
+---
+
+*Tags: Career, Learning, Development, Personal Growth*`
+};
+
+// Function to load markdown files using direct content
 const loadMarkdownFiles = async (): Promise<BlogPost[]> => {
   const posts: BlogPost[] = [];
   
-
-    // Import markdown files directly
-    const testingMd = await import('../md/testing.md?raw');
-    const aiMd = await import('../md/ai-fullstack-development.md?raw');
-    const journeyMd = await import('../md/development-journey.md?raw');
-    
-    const markdownFiles = [
-      { content: testingMd.default, filename: 'testing.md' },
-      { content: aiMd.default, filename: 'ai-fullstack-development.md' },
-      { content: journeyMd.default, filename: 'development-journey.md' }
-    ];
-    
-    for (const { content, filename } of markdownFiles) {
-      const post = extractMetadata(content, filename);
-      posts.push(post);
-    }
- 
+  const markdownFiles = [
+    { content: MARKDOWN_POSTS.testing, filename: 'testing.md' },
+    { content: MARKDOWN_POSTS.aiFullstack, filename: 'ai-fullstack-development.md' },
+    { content: MARKDOWN_POSTS.developmentJourney, filename: 'development-journey.md' }
+  ];
+  
+  for (const { content, filename } of markdownFiles) {
+    const post = extractMetadata(content, filename);
+    posts.push(post);
+  }
   
   // Sort posts by date (newest first)
   return posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+};
+
+// Custom components for ReactMarkdown to ensure proper styling
+const markdownComponents: Components = {
+  h1: ({ children, ...props }) => (
+    <h1 className="text-4xl font-display font-bold mb-6 text-foreground" {...props}>
+      {children}
+    </h1>
+  ),
+  h2: ({ children, ...props }) => (
+    <h2 className="text-2xl font-display font-semibold mb-4 mt-8 text-foreground" {...props}>
+      {children}
+    </h2>
+  ),
+  h3: ({ children, ...props }) => (
+    <h3 className="text-xl font-display font-semibold mb-3 mt-6 text-foreground" {...props}>
+      {children}
+    </h3>
+  ),
+  p: ({ children, ...props }) => (
+    <p className="mb-4 text-muted-foreground leading-relaxed" {...props}>
+      {children}
+    </p>
+  ),
+  ul: ({ children, ...props }) => (
+    <ul className="mb-4 ml-6 list-disc space-y-2" {...props}>
+      {children}
+    </ul>
+  ),
+  ol: ({ children, ...props }) => (
+    <ol className="mb-4 ml-6 list-decimal space-y-2" {...props}>
+      {children}
+    </ol>
+  ),
+  li: ({ children, ...props }) => (
+    <li className="text-muted-foreground" {...props}>
+      {children}
+    </li>
+  ),
+  strong: ({ children, ...props }) => (
+    <strong className="font-semibold text-foreground" {...props}>
+      {children}
+    </strong>
+  ),
+  em: ({ children, ...props }) => (
+    <em className="italic text-muted-foreground" {...props}>
+      {children}
+    </em>
+  ),
+  code: ({ children, className, ...props }) => {
+    const isInline = !className;
+    if (isInline) {
+      return (
+        <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono text-foreground" {...props}>
+          {children}
+        </code>
+      );
+    }
+    return (
+      <code className={className} {...props}>
+        {children}
+      </code>
+    );
+  },
+  pre: ({ children, ...props }) => (
+    <pre className="bg-muted border border-border rounded-lg p-4 mb-4 overflow-x-auto" {...props}>
+      {children}
+    </pre>
+  ),
+  blockquote: ({ children, ...props }) => (
+    <blockquote className="border-l-4 border-primary pl-4 my-4 italic text-muted-foreground" {...props}>
+      {children}
+    </blockquote>
+  ),
+  hr: ({ ...props }) => (
+    <hr className="my-8 border-border" {...props} />
+  ),
 };
 
 const Blog = () => {
@@ -158,8 +436,8 @@ const Blog = () => {
         {/* Post Content */}
         <main className="container mx-auto px-6 py-12 relative z-10">
           <article className="max-w-4xl mx-auto">
-            <div className="prose prose-lg dark:prose-invert max-w-none">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            <div className="prose prose-lg prose-slate dark:prose-invert max-w-none prose-headings:font-display prose-headings:font-bold prose-h1:text-4xl prose-h1:mb-6 prose-h2:text-2xl prose-h2:mb-4 prose-h3:text-xl prose-h3:mb-3 prose-p:mb-4 prose-ul:mb-4 prose-ol:mb-4 prose-li:mb-1 prose-code:bg-muted prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-muted prose-pre:border prose-pre:border-border">
+              <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
                 {selectedPost.content}
               </ReactMarkdown>
             </div>
