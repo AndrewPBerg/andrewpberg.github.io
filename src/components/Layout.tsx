@@ -10,6 +10,7 @@ const sections = [
   { id: 'contact', title: 'Contact' },
   { id: 'stack', title: 'Stack' },
   { id: 'projects', title: 'Projects' },
+  { id: 'publications', title: 'Publications' },
 ];
 
 const Layout = () => {
