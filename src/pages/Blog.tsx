@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Calendar, Clock } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, Tag } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { Components } from 'react-markdown';
-import { calculateReadingTime } from '../lib/readingTime';
+import { getMarkdownFilesWithMetadata } from '../lib/fileMetadata';
 
 // Interface for blog post metadata
 interface BlogPost {
@@ -15,25 +15,72 @@ interface BlogPost {
   readTime: string;
   slug: string;
   content: string;
+  tags: string[];
+  rawDate: Date;
 }
 
-// Function to extract metadata from markdown content
-const extractMetadata = (content: string, filename: string): BlogPost => {
+// Function to parse metadata from markdown content
+const parseMetadata = (content: string) => {
+  const lines = content.split('\n');
+  const metadata: { [key: string]: string } = {};
+  
+  // Parse metadata lines at the top of the file
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    
+    // Stop parsing metadata when we hit an empty line or content
+    if (!line || line.startsWith('#')) {
+      break;
+    }
+    
+    // Parse key: value format
+    const match = line.match(/^([^:]+):\s*(.+)$/);
+    if (match) {
+      const key = match[1].trim().toLowerCase();
+      const value = match[2].trim();
+      metadata[key] = value;
+    }
+  }
+  
+  return metadata;
+};
+
+// Function to extract metadata from markdown content using FileMetadata
+const extractMetadata = (fileMetadata: any): BlogPost => {
+  const { filename, content, readingTime } = fileMetadata;
+  
+  // Parse metadata from the top of the file
+  const metadata = parseMetadata(content);
+  
   const lines = content.split('\n');
   const title = lines.find(line => line.startsWith('# '))?.replace('# ', '') || filename;
   
-  // Extract date from the metadata line if it exists
-  const metaLine = lines.find(line => line.includes('Published:'));
-  const dateMatch = metaLine?.match(/Published: ([^•]+)/);
-  const date = dateMatch ? dateMatch[1].trim() : new Date().toLocaleDateString();
+  // Use metadata date if available, otherwise use file metadata
+  let date: string;
+  let rawDate: Date;
+  if (metadata.date) {
+    rawDate = new Date(metadata.date);
+    date = rawDate.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+  } else {
+    rawDate = fileMetadata.creationDate;
+    date = rawDate.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+  }
   
-  // Automatically calculate reading time based on content
-  const readTime = calculateReadingTime(content);
+  // Parse tags
+  const tags = metadata.tags ? metadata.tags.split(',').map(tag => tag.trim()) : [];
   
-  // Extract excerpt from first paragraph after title
+  // Extract excerpt from first paragraph after title and metadata
   const contentStart = lines.findIndex(line => line.startsWith('# ')) + 1;
   const firstParagraph = lines.slice(contentStart).find(line => 
-    line.trim() && !line.startsWith('*') && !line.startsWith('#')
+    line.trim() && !line.startsWith('*') && !line.startsWith('#') && !line.includes(':')
   );
   const excerpt = firstParagraph?.substring(0, 150) + '...' || 'No excerpt available';
   
@@ -42,236 +89,29 @@ const extractMetadata = (content: string, filename: string): BlogPost => {
     title,
     excerpt,
     date,
-    readTime,
+    readTime: readingTime,
     slug: filename.replace('.md', ''),
-    content
+    content,
+    tags,
+    rawDate
   };
 };
 
-// Markdown content as constants
-const MARKDOWN_POSTS = {
-  testing: `# Testing Blog Post
-
-This is a test blog post to demonstrate the markdown-based blog system.
-
-## Introduction
-
-Welcome to this test post! This demonstrates how markdown files can be rendered in our React blog.
-
-## Features
-
-- **Markdown rendering**: Convert \`.md\` files to HTML
-- **Dynamic loading**: Load posts from the \`src/md\` directory
-- **Modern styling**: Beautiful typography with Tailwind CSS
-
-## Code Example
-
-\`\`\`javascript
-const greeting = "Hello, World!";
-console.log(greeting);
-\`\`\`
-
-## Conclusion
-
-This is just a sample post to test the markdown rendering functionality.
-
----
-
-*Published: January 5, 2024*`,
-
-  aiFullstack: `# Building the Future: AI and Full-Stack Development
-
-*Published: January 15, 2024*
-
-Artificial intelligence is fundamentally transforming how we approach full-stack development, creating new paradigms and opportunities that were unimaginable just a few years ago.
-
-## The AI Revolution in Development
-
-The integration of AI tools into the development workflow has become more than just a trend—it's a fundamental shift in how we build software. From code generation to automated testing, AI is reshaping every aspect of the development lifecycle.
-
-### Key Areas of Impact
-
-1. **Code Generation**: AI-powered tools can now generate entire components and functions
-2. **Debugging Assistance**: Intelligent error detection and solution suggestions
-3. **Performance Optimization**: Automated analysis and improvement recommendations
-4. **Testing Automation**: Smart test case generation and execution
-
-## Modern Full-Stack Architecture
-
-Today's full-stack developers must navigate an increasingly complex landscape of technologies:
-
-\`\`\`typescript
-// Example: AI-assisted React component
-const AIComponent: React.FC<Props> = ({ data }) => {
-  const [insights, setInsights] = useState<AIInsights>();
-  
-  useEffect(() => {
-    analyzeData(data).then(setInsights);
-  }, [data]);
-  
-  return (
-    <div className="ai-component">
-      {insights && <InsightDisplay insights={insights} />}
-    </div>
-  );
-};
-\`\`\`
-
-## The Future Landscape
-
-As we look ahead, several trends are emerging:
-
-- **No-Code/Low-Code Evolution**: AI making development accessible to non-programmers
-- **Intelligent DevOps**: Automated deployment and scaling decisions
-- **Predictive Development**: AI anticipating and preventing issues before they occur
-
-## Conclusion
-
-The fusion of AI and full-stack development isn't just changing how we code—it's redefining what it means to be a developer in the modern era. Embracing these changes while maintaining core engineering principles will be key to success.
-
----
-
-*Tags: AI, Full-Stack, Development, Future Tech*`,
-
-  developmentJourney: `# From Concept to Code: My Development Journey
-
-*Published: January 10, 2024*
-
-Every developer has a unique story of how they arrived at their current skills and perspective. This is mine—a journey through challenges, breakthroughs, and continuous learning.
-
-## The Beginning
-
-My journey into development started not with code, but with curiosity. Like many developers, I was drawn to the idea of creating something from nothing, of building digital solutions to real-world problems.
-
-### First Steps
-
-The early days were marked by:
-
-- **Trial and Error**: Learning by breaking things and fixing them
-- **Documentation Deep Dives**: Spending hours reading MDN and Stack Overflow
-- **Project-Based Learning**: Building small projects to understand concepts
-
-## The Learning Curve
-
-### Frontend Foundations
-
-Starting with HTML, CSS, and JavaScript felt like learning a new language—which, of course, it was. The progression was gradual but rewarding:
-
-\`\`\`html
-<!-- My first "Hello World" -->
-<!DOCTYPE html>
-<html>
-<head>
-    <title>My First Page</title>
-</head>
-<body>
-    <h1>Hello, World!</h1>
-    <script>
-        console.log("I'm a developer now!");
-    </script>
-</body>
-</html>
-\`\`\`
-
-### Backend Adventures
-
-Moving to backend development opened up new possibilities and challenges:
-
-- **Server Logic**: Understanding request-response cycles
-- **Database Design**: Learning relational and NoSQL concepts
-- **API Development**: Building robust, scalable endpoints
-
-## Key Milestones
-
-### The Framework Discovery
-
-Discovering React changed everything. The component-based architecture made sense, and suddenly complex UIs became manageable:
-
-\`\`\`jsx
-// The moment it clicked
-const MyFirstComponent = () => {
-  const [count, setCount] = useState(0);
-  
-  return (
-    <div>
-      <p>Count: {count}</p>
-      <button onClick={() => setCount(count + 1)}>
-        Increment
-      </button>
-    </div>
-  );
-};
-\`\`\`
-
-### Full-Stack Integration
-
-Learning to connect frontend and backend was like solving a complex puzzle. Each successful API call felt like a small victory.
-
-## Challenges and Growth
-
-### Common Obstacles
-
-1. **Impostor Syndrome**: Feeling like I didn't belong in the tech community
-2. **Technology Overload**: Too many frameworks, too little time
-3. **Debugging Nightmares**: Spending days on seemingly simple bugs
-
-### Lessons Learned
-
-- **Fundamentals Matter**: Strong basics make learning new technologies easier
-- **Community is Key**: Other developers are your greatest resource
-- **Practice, Practice, Practice**: There's no substitute for hands-on experience
-
-## Current Focus
-
-Today, my interests center around:
-
-- **Modern JavaScript/TypeScript**: Leveraging type safety and modern features
-- **React Ecosystem**: Exploring Next.js, state management, and testing
-- **AI Integration**: Incorporating AI tools to enhance development workflow
-
-## Looking Forward
-
-The journey continues with exciting developments on the horizon:
-
-- **Web3 Technologies**: Exploring blockchain and decentralized applications
-- **Edge Computing**: Understanding distributed systems and serverless architectures
-- **Developer Experience**: Building tools that make other developers' lives easier
-
-## Advice for New Developers
-
-If you're starting your journey, remember:
-
-1. **Be Patient**: Progress isn't always linear
-2. **Build Projects**: Portfolio beats certificates every time
-3. **Stay Curious**: Technology evolves rapidly—keep learning
-4. **Find Your Community**: Connect with other developers online and offline
-
-## Conclusion
-
-Development is more than just writing code—it's about solving problems, continuous learning, and building the future one line at a time. The journey is challenging but incredibly rewarding.
-
----
-
-*Tags: Career, Learning, Development, Personal Growth*`
-};
-
-// Function to load markdown files using direct content
+// Function to load all markdown files from the md directory
 const loadMarkdownFiles = async (): Promise<BlogPost[]> => {
-  const posts: BlogPost[] = [];
-  
-  const markdownFiles = [
-    { content: MARKDOWN_POSTS.testing, filename: 'testing.md' },
-    { content: MARKDOWN_POSTS.aiFullstack, filename: 'ai-fullstack-development.md' },
-    { content: MARKDOWN_POSTS.developmentJourney, filename: 'development-journey.md' }
-  ];
-  
-  for (const { content, filename } of markdownFiles) {
-    const post = extractMetadata(content, filename);
-    posts.push(post);
+  try {
+    // Get all markdown files with metadata
+    const filesWithMetadata = await getMarkdownFilesWithMetadata();
+    
+    // Convert to BlogPost format
+    const posts = filesWithMetadata.map(file => extractMetadata(file));
+    
+    // Sort posts by date (newest first)
+    return posts.sort((a, b) => b.rawDate.getTime() - a.rawDate.getTime());
+  } catch (error) {
+    console.error('Error loading markdown files:', error);
+    return [];
   }
-  
-  // Sort posts by date (newest first)
-  return posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 };
 
 // Custom components for ReactMarkdown to ensure proper styling
@@ -437,6 +277,35 @@ const Blog = () => {
         {/* Post Content */}
         <main className="container mx-auto px-6 py-12 relative z-10">
           <article className="max-w-4xl mx-auto">
+            {/* Post metadata */}
+            <div className="mb-8">
+              <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
+                <div className="flex items-center gap-1">
+                  <Calendar className="w-4 h-4" />
+                  <span>{selectedPost.date}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Clock className="w-4 h-4" />
+                  <span>{selectedPost.readTime}</span>
+                </div>
+              </div>
+              {selectedPost.tags.length > 0 && (
+                <div className="flex items-center gap-2 mb-6">
+                  <Tag className="w-4 h-4 text-muted-foreground" />
+                  <div className="flex flex-wrap gap-2">
+                    {selectedPost.tags.map((tag, index) => (
+                      <span 
+                        key={index}
+                        className="bg-muted px-2 py-1 rounded text-xs text-muted-foreground"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+            
             <div className="prose prose-lg prose-slate dark:prose-invert max-w-none prose-headings:font-display prose-headings:font-bold prose-h1:text-4xl prose-h1:mb-6 prose-h2:text-2xl prose-h2:mb-4 prose-h3:text-xl prose-h3:mb-3 prose-p:mb-4 prose-ul:mb-4 prose-ol:mb-4 prose-li:mb-1 prose-code:bg-muted prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-muted prose-pre:border prose-pre:border-border">
               <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
                 {selectedPost.content}
@@ -516,15 +385,38 @@ const Blog = () => {
                       </div>
                     </div>
                     
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-4 h-4" />
-                        <span>{post.date}</span>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-1">
+                          <Calendar className="w-4 h-4" />
+                          <span>{post.date}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Clock className="w-4 h-4" />
+                          <span>{post.readTime}</span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Clock className="w-4 h-4" />
-                        <span>{post.readTime}</span>
-                      </div>
+                      
+                      {post.tags.length > 0 && (
+                        <div className="flex items-center gap-2">
+                          <Tag className="w-3 h-3 text-muted-foreground" />
+                          <div className="flex flex-wrap gap-1">
+                            {post.tags.slice(0, 3).map((tag, index) => (
+                              <span 
+                                key={index}
+                                className="bg-muted/50 px-2 py-0.5 rounded text-xs text-muted-foreground"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                            {post.tags.length > 3 && (
+                              <span className="text-xs text-muted-foreground">
+                                +{post.tags.length - 3}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </article>
@@ -538,7 +430,7 @@ const Blog = () => {
               <div className="border border-dashed border-border/50 rounded-lg p-8 md:p-12">
                 <h3 className="text-xl font-display font-medium mb-4">No Posts Found</h3>
                 <p className="text-muted-foreground mb-6">
-                  Markdown files could not be loaded. Make sure the files are accessible in the src/md directory.
+                  No markdown files were found in the src/md directory.
                 </p>
               </div>
             </div>

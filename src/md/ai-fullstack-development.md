@@ -1,3 +1,6 @@
+date: June 6, 2025
+tags: AI, Test, TODO
+
 # Building the Future: AI and Full-Stack Development
 
 

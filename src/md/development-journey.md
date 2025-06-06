@@ -1,6 +1,7 @@
-# From Concept to Code: My Development Journey
+date: January 10, 2024
+tags: Career, Learning, Development, Personal Growth
 
-*Published: January 10, 2024*
+# From Concept to Code: My Development Journey
 
 Every developer has a unique story of how they arrived at their current skills and perspective. This is mine—a journey through challenges, breakthroughs, and continuous learning.
 
@@ -113,8 +114,4 @@ If you're starting your journey, remember:
 
 ## Conclusion
 
-Development is more than just writing code—it's about solving problems, continuous learning, and building the future one line at a time. The journey is challenging but incredibly rewarding.
-
----
-
-*Tags: Career, Learning, Development, Personal Growth* 
+Development is more than just writing code—it's about solving problems, continuous learning, and building the future one line at a time. The journey is challenging but incredibly rewarding. 

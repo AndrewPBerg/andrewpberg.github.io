@@ -1,6 +1,7 @@
-# Testing Blog Post
+date: January 5, 2024
+tags: Testing, Demo, Markdown
 
-*Published: January 5, 2024*
+# Testing Blog Post
 
 This is a test blog post to demonstrate the markdown-based blog system.
 
