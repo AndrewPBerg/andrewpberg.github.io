@@ -40,6 +40,7 @@ const Stack = () => {
         { name: 'Scikit-learn', icon: Beaker },
         { name: 'Pandas', icon: Beaker },
         { name: 'NumPy', icon: Beaker },
+        { name: 'Lightning AI', icon: Beaker },
         { name: 'Pydantic', icon: Beaker },
         { name: 'WandB', icon: Beaker },
       ],

@@ -21,7 +21,8 @@ const Contact = () => {
       <div ref={contentRef}>
         <p className="text-xs text-muted-foreground mb-3">
           Always looking for new projects. <br />
-          Best way to reach me is email.
+          Best way to reach me is email. <br />
+          Email for CV or business inquiries.
         </p>
         
         <div className="space-y-3 mb-3">
@@ -34,16 +35,7 @@ const Contact = () => {
               </a>
             </div>
           </div>
-          
-          <div className="flex items-start">
-            <Phone className="w-3 h-3 mt-0.5 mr-2 text-muted-foreground" />
-            <div>
-              <div className="text-[10px] text-muted-foreground">Phone</div>
-              <a href="tel:8038296274" className="text-xs hover:text-primary transition-colors font-medium">
-                803-829-6274
-              </a>
-            </div>
-          </div>
+        
           
           <div className="flex items-start">
             <MapPin className="w-3 h-3 mt-0.5 mr-2 text-muted-foreground" />
