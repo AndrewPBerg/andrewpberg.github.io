@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Calendar, Clock, Tag, Sun, Moon, Copy, Check, Filter, ChevronDown } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, Tag, Sun, Moon, Copy, Check, ChevronDown } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { Components } from 'react-markdown';
@@ -542,11 +542,12 @@ const Blog = () => {
         {!loading && blogPosts.length > 0 && (
           <div className="max-w-4xl mx-auto mb-8 sm:mb-10">
             <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Filter className={`w-4 h-4 ${blogTheme === 'light' ? 'text-gray-600' : 'text-muted-foreground'}`} />
-                <span className={`text-sm font-medium ${blogTheme === 'light' ? 'text-gray-900' : 'text-foreground'}`}>
-                  Filters:
-                </span>
+              {/* Results count */}
+              <div className={`text-sm ${blogTheme === 'light' ? 'text-gray-600' : 'text-muted-foreground'}`}>
+                Showing {filteredPosts.length} of {blogPosts.length} post{blogPosts.length !== 1 ? 's' : ''}
+                {selectedTag !== 'all' && (
+                  <span> • Filtered by tag: <span className="font-medium">{selectedTag}</span></span>
+                )}
               </div>
               
               <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
@@ -596,14 +597,6 @@ const Blog = () => {
                   </div>
                 )}
               </div>
-            </div>
-
-            {/* Results count */}
-            <div className={`mt-4 text-sm ${blogTheme === 'light' ? 'text-gray-600' : 'text-muted-foreground'}`}>
-              Showing {filteredPosts.length} of {blogPosts.length} post{blogPosts.length !== 1 ? 's' : ''}
-              {selectedTag !== 'all' && (
-                <span> • Filtered by tag: <span className="font-medium">{selectedTag}</span></span>
-              )}
             </div>
           </div>
         )}
