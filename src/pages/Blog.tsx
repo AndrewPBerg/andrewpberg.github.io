@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Calendar, Clock, Tag } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, Tag, Sun, Moon } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { Components } from 'react-markdown';
@@ -223,6 +223,22 @@ const Blog = () => {
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
+  const [blogTheme, setBlogTheme] = useState<'light' | 'dark'>('dark');
+
+  // Load theme from localStorage on mount
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('blog-theme') as 'light' | 'dark' | null;
+    if (savedTheme) {
+      setBlogTheme(savedTheme);
+    }
+  }, []);
+
+  // Toggle theme function
+  const toggleTheme = () => {
+    const newTheme = blogTheme === 'dark' ? 'light' : 'dark';
+    setBlogTheme(newTheme);
+    localStorage.setItem('blog-theme', newTheme);
+  };
 
   useEffect(() => {
     // Clean up any existing VANTA effects when blog mounts
@@ -277,26 +293,51 @@ const Blog = () => {
   // If a post is selected, show the full post view
   if (selectedPost) {
     return (
-      <div className="min-h-screen bg-background relative z-10">
-        <div className="fixed inset-0 bg-background -z-10" />
+      <div className={`min-h-screen relative z-10 ${blogTheme === 'light' ? 'bg-white text-gray-900' : 'bg-background text-foreground'}`}>
+        <div className={`fixed inset-0 -z-10 ${blogTheme === 'light' ? 'bg-white' : 'bg-background'}`} />
         
         {/* Header */}
-        <header className="border-b border-border/50 bg-background/80 backdrop-blur-sm sticky top-0 z-50">
+        <header className={`border-b sticky top-0 z-50 backdrop-blur-sm ${
+          blogTheme === 'light' 
+            ? 'border-gray-200 bg-white/80' 
+            : 'border-border/50 bg-background/80'
+        }`}>
           <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
             <div className="flex items-center justify-between">
               <button 
                 onClick={() => setSelectedPost(null)}
-                className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+                className={`flex items-center gap-2 transition-colors ${
+                  blogTheme === 'light'
+                    ? 'text-gray-600 hover:text-gray-900'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span className="text-sm">Back to Blog</span>
               </button>
-              <Link 
-                to="/" 
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Portfolio
-              </Link>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={toggleTheme}
+                  className={`p-2 rounded-full transition-colors ${
+                    blogTheme === 'light'
+                      ? 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                  }`}
+                  aria-label="Toggle theme"
+                >
+                  {blogTheme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-6 h-6" />}
+                </button>
+                <Link 
+                  to="/" 
+                  className={`text-sm transition-colors ${
+                    blogTheme === 'light'
+                      ? 'text-gray-600 hover:text-gray-900'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  Portfolio
+                </Link>
+              </div>
             </div>
           </div>
         </header>
@@ -306,7 +347,9 @@ const Blog = () => {
           <article className="max-w-none sm:max-w-3xl md:max-w-4xl mx-auto">
             {/* Post metadata */}
             <div className="mb-6 sm:mb-8">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-muted-foreground mb-4">
+              <div className={`flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm mb-4 ${
+                blogTheme === 'light' ? 'text-gray-600' : 'text-muted-foreground'
+              }`}>
                 <div className="flex items-center gap-1">
                   <Calendar className="w-4 h-4" />
                   <span>{selectedPost.date}</span>
@@ -318,12 +361,16 @@ const Blog = () => {
               </div>
               {selectedPost.tags.length > 0 && (
                 <div className="flex items-start gap-2 mb-4 sm:mb-6">
-                  <Tag className="w-4 h-4 text-muted-foreground mt-0.5" />
+                  <Tag className={`w-4 h-4 mt-0.5 ${blogTheme === 'light' ? 'text-gray-600' : 'text-muted-foreground'}`} />
                   <div className="flex flex-wrap gap-2">
                     {selectedPost.tags.map((tag, index) => (
                       <span 
                         key={index}
-                        className="bg-muted px-2 py-1 rounded text-xs text-muted-foreground"
+                        className={`px-2 py-1 rounded text-xs ${
+                          blogTheme === 'light'
+                            ? 'bg-gray-100 text-gray-600'
+                            : 'bg-muted text-muted-foreground'
+                        }`}
                       >
                         {tag}
                       </span>
@@ -333,7 +380,11 @@ const Blog = () => {
               )}
             </div>
             
-            <div className="prose prose-sm sm:prose-base md:prose-lg prose-slate dark:prose-invert max-w-none prose-headings:font-display prose-headings:font-bold prose-h1:text-2xl sm:prose-h1:text-3xl md:prose-h1:text-4xl prose-h1:mb-4 sm:prose-h1:mb-6 prose-h2:text-xl sm:prose-h2:text-2xl prose-h2:mb-3 sm:prose-h2:mb-4 prose-h3:text-lg sm:prose-h3:text-xl prose-h3:mb-2 sm:prose-h3:mb-3 prose-p:mb-3 sm:prose-p:mb-4 prose-ul:mb-3 sm:prose-ul:mb-4 prose-ol:mb-3 sm:prose-ol:mb-4 prose-li:mb-1 prose-code:bg-muted prose-code:px-1 sm:prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-pre:bg-muted prose-pre:border prose-pre:border-border prose-pre:text-xs sm:prose-pre:text-sm">
+            <div className={`prose prose-sm sm:prose-base md:prose-lg max-w-none prose-headings:font-display prose-headings:font-bold prose-h1:text-2xl sm:prose-h1:text-3xl md:prose-h1:text-4xl prose-h1:mb-4 sm:prose-h1:mb-6 prose-h2:text-xl sm:prose-h2:text-2xl prose-h2:mb-3 sm:prose-h2:mb-4 prose-h3:text-lg sm:prose-h3:text-xl prose-h3:mb-2 sm:prose-h3:mb-3 prose-p:mb-3 sm:prose-p:mb-4 prose-ul:mb-3 sm:prose-ul:mb-4 prose-ol:mb-3 sm:prose-ol:mb-4 prose-li:mb-1 prose-code:px-1 sm:prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-pre:text-xs sm:prose-pre:text-sm ${
+              blogTheme === 'light' 
+                ? 'prose-slate prose-headings:text-gray-900 prose-p:text-gray-700 prose-strong:text-gray-900 prose-em:text-gray-600 prose-code:bg-gray-100 prose-code:text-gray-800 prose-pre:bg-gray-100 prose-pre:border prose-pre:border-gray-200 prose-blockquote:border-l-gray-300 prose-blockquote:text-gray-600 prose-hr:border-gray-200'
+                : 'prose-slate dark:prose-invert prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-em:text-muted-foreground prose-code:bg-muted prose-code:text-foreground prose-pre:bg-muted prose-pre:border prose-pre:border-border prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground prose-hr:border-border'
+            }`}>
               <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
                 {selectedPost.content}
               </ReactMarkdown>
@@ -342,9 +393,13 @@ const Blog = () => {
         </main>
 
         {/* Footer */}
-        <footer className="border-t border-border/50 mt-12 sm:mt-16 md:mt-20 relative z-10">
+        <footer className={`border-t mt-12 sm:mt-16 md:mt-20 relative z-10 ${
+          blogTheme === 'light' ? 'border-gray-200' : 'border-border/50'
+        }`}>
           <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
-            <div className="text-center text-sm text-muted-foreground">
+            <div className={`text-center text-sm ${
+              blogTheme === 'light' ? 'text-gray-600' : 'text-muted-foreground'
+            }`}>
               <p>&copy; 2024 Andrew P. Berg. All rights reserved.</p>
             </div>
           </div>
@@ -354,22 +409,40 @@ const Blog = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background relative z-10">
+    <div className={`min-h-screen relative z-10 ${blogTheme === 'light' ? 'bg-white text-gray-900' : 'bg-background text-foreground'}`}>
       {/* Ensure no background effects by adding a solid background overlay */}
-      <div className="fixed inset-0 bg-background -z-10" />
+      <div className={`fixed inset-0 -z-10 ${blogTheme === 'light' ? 'bg-white' : 'bg-background'}`} />
       
       {/* Header */}
-      <header className="border-b border-border/50 bg-background/80 backdrop-blur-sm sticky top-0 z-50">
+      <header className={`border-b sticky top-0 z-50 backdrop-blur-sm ${
+        blogTheme === 'light' 
+          ? 'border-gray-200 bg-white/80' 
+          : 'border-border/50 bg-background/80'
+      }`}>
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
             <Link 
               to="/" 
-              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+              className={`flex items-center gap-2 transition-colors ${
+                blogTheme === 'light'
+                  ? 'text-gray-600 hover:text-gray-900'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
             >
               <ArrowLeft className="w-4 h-4" />
               <span className="text-sm">Back to Portfolio</span>
             </Link>
-            <div className="w-20"></div> {/* Spacer for center alignment */}
+            <button
+              onClick={toggleTheme}
+              className={`p-2 rounded-full transition-colors ${
+                blogTheme === 'light'
+                  ? 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+              }`}
+              aria-label="Toggle theme"
+            >
+              {blogTheme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+            </button>
           </div>
         </div>
       </header>
@@ -378,10 +451,14 @@ const Blog = () => {
       <main className="container mx-auto px-4 sm:px-6 py-8 sm:py-10 md:py-12 relative z-10">
         {/* Hero Section */}
         <div className="max-w-3xl mx-auto text-center mb-10 sm:mb-12 md:mb-16">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold mb-4 sm:mb-6">
+          <h2 className={`text-3xl sm:text-4xl md:text-5xl font-display font-bold mb-4 sm:mb-6 ${
+            blogTheme === 'light' ? 'text-gray-900' : 'text-foreground'
+          }`}>
             Andrew P. Berg's Blog
           </h2>
-          <p className="text-base sm:text-lg text-muted-foreground leading-relaxed px-2 sm:px-0">
+          <p className={`text-base sm:text-lg leading-relaxed px-2 sm:px-0 ${
+            blogTheme === 'light' ? 'text-gray-600' : 'text-muted-foreground'
+          }`}>
             Informal posts about what I am learning/working on. 
           </p>
         </div>
@@ -390,7 +467,7 @@ const Blog = () => {
         <div className="max-w-4xl mx-auto">
           {loading ? (
             <div className="text-center py-8 sm:py-12">
-              <p className="text-muted-foreground">Loading blog posts...</p>
+              <p className={blogTheme === 'light' ? 'text-gray-600' : 'text-muted-foreground'}>Loading blog posts...</p>
             </div>
           ) : (
             <div className="grid gap-6 sm:gap-8 md:gap-12">
@@ -400,20 +477,32 @@ const Blog = () => {
                   className="group cursor-pointer"
                   onClick={() => setSelectedPost(post)}
                 >
-                  <div className="border border-border/50 rounded-lg p-4 sm:p-6 md:p-8 hover:border-border transition-all duration-300 hover:shadow-lg bg-card/30 backdrop-blur-sm">
+                  <div className={`border rounded-lg p-4 sm:p-6 md:p-8 transition-all duration-300 hover:shadow-lg backdrop-blur-sm ${
+                    blogTheme === 'light'
+                      ? 'border-gray-200 hover:border-gray-300 bg-white/60 hover:bg-white/80'
+                      : 'border-border/50 hover:border-border bg-card/30'
+                  }`}>
                     <div className="flex flex-col gap-3 sm:gap-4 mb-4">
                       <div className="flex-1">
-                        <h3 className="text-lg sm:text-xl md:text-2xl font-display font-semibold mb-2 sm:mb-3 group-hover:text-primary transition-colors leading-tight">
+                        <h3 className={`text-lg sm:text-xl md:text-2xl font-display font-semibold mb-2 sm:mb-3 transition-colors leading-tight ${
+                          blogTheme === 'light'
+                            ? 'text-gray-900 group-hover:text-blue-600'
+                            : 'text-foreground group-hover:text-primary'
+                        }`}>
                           {post.title}
                         </h3>
-                        <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-3 sm:mb-4">
+                        <p className={`text-sm sm:text-base leading-relaxed mb-3 sm:mb-4 ${
+                          blogTheme === 'light' ? 'text-gray-600' : 'text-muted-foreground'
+                        }`}>
                           {post.excerpt}
                         </p>
                       </div>
                     </div>
                     
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-muted-foreground">
+                      <div className={`flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm ${
+                        blogTheme === 'light' ? 'text-gray-600' : 'text-muted-foreground'
+                      }`}>
                         <div className="flex items-center gap-1">
                           <Calendar className="w-4 h-4" />
                           <span>{post.date}</span>
@@ -426,18 +515,26 @@ const Blog = () => {
                       
                       {post.tags.length > 0 && (
                         <div className="flex items-start gap-2">
-                          <Tag className="w-3 h-3 text-muted-foreground mt-0.5 sm:mt-0" />
+                          <Tag className={`w-3 h-3 mt-0.5 sm:mt-0 ${
+                            blogTheme === 'light' ? 'text-gray-600' : 'text-muted-foreground'
+                          }`} />
                           <div className="flex flex-wrap gap-1">
                             {post.tags.slice(0, 3).map((tag, index) => (
                               <span 
                                 key={index}
-                                className="bg-muted/50 px-2 py-0.5 rounded text-xs text-muted-foreground"
+                                className={`px-2 py-0.5 rounded text-xs ${
+                                  blogTheme === 'light'
+                                    ? 'bg-gray-100 text-gray-600'
+                                    : 'bg-muted/50 text-muted-foreground'
+                                }`}
                               >
                                 {tag}
                               </span>
                             ))}
                             {post.tags.length > 3 && (
-                              <span className="text-xs text-muted-foreground">
+                              <span className={`text-xs ${
+                                blogTheme === 'light' ? 'text-gray-600' : 'text-muted-foreground'
+                              }`}>
                                 +{post.tags.length - 3}
                               </span>
                             )}
@@ -454,9 +551,15 @@ const Blog = () => {
           {/* Message if no posts are loaded */}
           {!loading && blogPosts.length === 0 && (
             <div className="mt-12 sm:mt-16 text-center">
-              <div className="border border-dashed border-border/50 rounded-lg p-6 sm:p-8 md:p-12">
-                <h3 className="text-lg sm:text-xl font-display font-medium mb-3 sm:mb-4">No Posts Found</h3>
-                <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6">
+              <div className={`border border-dashed rounded-lg p-6 sm:p-8 md:p-12 ${
+                blogTheme === 'light' ? 'border-gray-300' : 'border-border/50'
+              }`}>
+                <h3 className={`text-lg sm:text-xl font-display font-medium mb-3 sm:mb-4 ${
+                  blogTheme === 'light' ? 'text-gray-900' : 'text-foreground'
+                }`}>No Posts Found</h3>
+                <p className={`text-sm sm:text-base mb-4 sm:mb-6 ${
+                  blogTheme === 'light' ? 'text-gray-600' : 'text-muted-foreground'
+                }`}>
                   No markdown files were found in the src/md directory.
                 </p>
               </div>
@@ -466,9 +569,13 @@ const Blog = () => {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border/50 mt-12 sm:mt-16 md:mt-20 relative z-10">
+      <footer className={`border-t mt-12 sm:mt-16 md:mt-20 relative z-10 ${
+        blogTheme === 'light' ? 'border-gray-200' : 'border-border/50'
+      }`}>
         <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
-          <div className="text-center text-sm text-muted-foreground">
+          <div className={`text-center text-sm ${
+            blogTheme === 'light' ? 'text-gray-600' : 'text-muted-foreground'
+          }`}>
             <p>&copy; 2024 Andrew P. Berg. All rights reserved.</p>
           </div>
         </div>
