@@ -89,10 +89,10 @@ const TopologyEffect = memo(({ activeSection = 'info' }: TopologyEffectProps) =>
     const foregroundColor = sectionColors.foreground;
 
     // Optimized particle count for better performance and visual impact
-    const particleCount = isMobile ? 800 : 1200;
-    const particleSize = isMobile ? 0.8 : 1.2;
-    const noiseSize = isMobile ? 0.003 : 0.006;
-    const scale = isMobile ? 0.7 : 1.2;
+    const particleCount = isMobile ? 600 : 1200;
+    const particleSize = isMobile ? 1.4 : 1.2;
+    const noiseSize = isMobile ? 0.008 : 0.006;
+    const scale = isMobile ? 1.8 : 1.2;
 
     // Check if effect exists and is still valid
     const effectExists = vantaEffectRef.current && 
@@ -121,13 +121,13 @@ const TopologyEffect = memo(({ activeSection = 'info' }: TopologyEffectProps) =>
           minHeight: 0.00,
           minWidth: 0.00,
           scale: scale,
-          scaleMobile: 0.9,
+          scaleMobile: 2.0,
           color: foregroundColor,
           backgroundColor: backgroundColor,
           speed: 1.3, // Optimized speed for smooth performance
           particleCount: particleCount,
           particleSize: particleSize,
-          flowCellSize: isMobile ? 16 : 10, // Better balance for performance vs detail
+          flowCellSize: isMobile ? 6 : 10, // Better balance for performance vs detail
           noiseSize: noiseSize,
           noiseRadius: 0.15, // Increased for more organic movement
           colorMode: 'variance',
