@@ -219,28 +219,28 @@ const Layout = () => {
             </Link>
           </div>
           
-          <div className="fixed bottom-6 left-0 right-0 z-50">
+          <div className="fixed bottom-6 left-0 right-0 z-50 px-4">
             <div className="flex flex-row justify-center mx-auto">
-              <div className="menu-glass py-2 px-3 rounded-full shadow-md flex items-center gap-4 border border-border/30"
+              <div className="menu-glass py-1.5 px-2 rounded-full shadow-md flex items-center gap-1.5 sm:gap-3 border border-border/30 max-w-full overflow-x-auto"
                    style={{ transform: 'translateZ(0)' }}>
                 {sections.map((section) => (
                   <button
                     key={section.id}
                     onClick={() => handleSectionChange(section.id)}
-                    className={`group flex flex-col items-center gap-1.5 py-1 px-1 focus:outline-none ${
+                    className={`group flex flex-col items-center gap-1 py-1 px-0.5 sm:px-1 focus:outline-none flex-shrink-0 ${
                       isAnimating ? 'pointer-events-none opacity-70' : ''
                     }`}
                     disabled={isAnimating}
                   >
                     <div 
                       ref={el => buttonRefs.current[section.id] = el}
-                      className={`relative h-2.5 w-2.5 rounded-full transition-colors duration-200 ${
+                      className={`relative h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full transition-colors duration-200 ${
                         section.id === activeSection 
                           ? 'bg-foreground shadow-md' 
                           : 'bg-muted-foreground/30 group-hover:bg-foreground/60'
                       }`}
                     />
-                    <span className={`text-xs tracking-wide transition-colors duration-200 ${
+                    <span className={`text-[10px] sm:text-xs tracking-tight transition-colors duration-200 whitespace-nowrap ${
                       section.id === activeSection 
                         ? 'text-foreground font-semibold drop-shadow-sm' 
                         : 'text-muted-foreground/70 group-hover:text-foreground/90 group-hover:font-medium'
