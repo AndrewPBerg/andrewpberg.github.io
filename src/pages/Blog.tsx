@@ -659,11 +659,11 @@ const Blog = () => {
               
               <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                 {/* Sort By Filter */}
-                <div className="relative">
+                <div className="relative overflow-hidden">
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value as SortOption)}
-                    className={`appearance-none border rounded-md px-3 py-2 pr-8 text-sm cursor-pointer transition-colors ${
+                    className={`appearance-none border rounded-md px-3 py-2 pr-10 text-sm cursor-pointer transition-colors w-full ${
                       blogTheme === 'light'
                         ? 'bg-white border-gray-300 text-gray-900 hover:border-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20'
                         : 'bg-background border-border text-foreground hover:border-border/80 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20'
@@ -674,18 +674,18 @@ const Blog = () => {
                     <option value="alpha-asc">A-Z</option>
                     <option value="alpha-desc">Z-A</option>
                   </select>
-                  <ChevronDown className={`absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none ${
+                  <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none ${
                     blogTheme === 'light' ? 'text-gray-600' : 'text-muted-foreground'
                   }`} />
                 </div>
 
                 {/* Tag Filter */}
                 {availableTags.length > 0 && (
-                  <div className="relative">
+                  <div className="relative overflow-hidden">
                     <select
                       value={selectedTag}
                       onChange={(e) => setSelectedTag(e.target.value)}
-                      className={`appearance-none border rounded-md px-3 py-2 pr-8 text-sm cursor-pointer transition-colors min-w-[120px] ${
+                      className={`appearance-none border rounded-md px-3 py-2 pr-10 text-sm cursor-pointer transition-colors w-full min-w-[120px] ${
                         blogTheme === 'light'
                           ? 'bg-white border-gray-300 text-gray-900 hover:border-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20'
                           : 'bg-background border-border text-foreground hover:border-border/80 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20'
@@ -698,7 +698,7 @@ const Blog = () => {
                         </option>
                       ))}
                     </select>
-                    <ChevronDown className={`absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none ${
+                    <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none ${
                       blogTheme === 'light' ? 'text-gray-600' : 'text-muted-foreground'
                     }`} />
                   </div>
