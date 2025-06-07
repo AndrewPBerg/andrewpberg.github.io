@@ -12,6 +12,7 @@ const sections = [
   { id: 'stack', title: 'Stack' },
   { id: 'projects', title: 'Projects' },
   { id: 'publications', title: 'Publications' },
+  { id: 'books', title: 'Book Recs.' },
 ];
 
 const Layout = () => {

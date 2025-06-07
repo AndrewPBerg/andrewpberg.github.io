@@ -25,45 +25,53 @@ const colorSchemes: ColorSchemes = {
   dark: {
     info: {
       background: 0x0a0a0a, // Very dark grey
-      foreground: 0x00d4ff, // Bright cyan - professional and modern
+      foreground: 0x6b9dc2, // Muted blue - subtle and professional
     },
     contact: {
       background: 0x0a0a0a,
-      foreground: 0xff6b35, // Vibrant orange - warm and inviting
+      foreground: 0xb8845f, // Muted orange - warm but subtle
     },
     stack: {
       background: 0x0a0a0a,
-      foreground: 0x39ff14, // Electric green - tech/coding vibe
+      foreground: 0x7ba05b, // Muted green - soft tech vibe
     },
     projects: {
       background: 0x0a0a0a,
-      foreground: 0xff1744, // Bright red - bold and attention-grabbing
+      foreground: 0xb85450, // Muted red - understated
     },
     publications: {
       background: 0x0a0a0a,
-      foreground: 0x9c27b0, // Vibrant purple - academic/scholarly
+      foreground: 0x8b6b9c, // Muted purple - scholarly but soft
+    },
+    books: {
+      background: 0x0a0a0a,
+      foreground: 0xa89074, // Muted beige - warm and literary
     },
   },
   light: {
     info: {
       background: 0xf8f9fa, // Very light grey
-      foreground: 0x0066cc, // Strong blue - professional
+      foreground: 0x4a6b85, // Muted blue - professional but soft
     },
     contact: {
       background: 0xf8f9fa,
-      foreground: 0xe65100, // Deep orange - warm contrast
+      foreground: 0x9c6b47, // Muted orange - warm contrast but subtle
     },
     stack: {
       background: 0xf8f9fa,
-      foreground: 0x2e7d32, // Forest green - tech/growth
+      foreground: 0x5a7a4a, // Muted green - growth but gentle
     },
     projects: {
       background: 0xf8f9fa,
-      foreground: 0xc62828, // Deep red - strong contrast
+      foreground: 0x9c5a5a, // Muted red - contrast but not harsh
     },
     publications: {
       background: 0xf8f9fa,
-      foreground: 0x7b1fa2, // Deep purple - scholarly elegance
+      foreground: 0x6b5a7a, // Muted purple - scholarly elegance but soft
+    },
+    books: {
+      background: 0xf8f9fa,
+      foreground: 0x7a6b5a, // Muted brown - warm and readable
     },
   },
 };
