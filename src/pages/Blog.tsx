@@ -319,19 +319,15 @@ const Blog = () => {
     // Clean up any existing VANTA effects when blog mounts
     const cleanupVanta = () => {
       if (typeof window !== 'undefined') {
-        // Remove any existing VANTA canvases
+        // Only remove VANTA canvases that are not part of the main portfolio
         const vantaCanvases = document.querySelectorAll('.vanta-canvas');
         vantaCanvases.forEach(canvas => {
-          canvas.remove();
-        });
-        
-        // Cancel any animation frames that might be running
-        if (window.requestAnimationFrame) {
-          let id = window.requestAnimationFrame(() => {});
-          for (let i = 0; i <= id; i++) {
-            window.cancelAnimationFrame(i);
+          // Only remove if it's not attached to the main topology effect container
+          const parent = canvas.parentElement;
+          if (parent && !parent.classList.contains('topology-effect-container')) {
+            canvas.remove();
           }
-        }
+        });
       }
     };
 
@@ -344,9 +340,18 @@ const Blog = () => {
       setLoading(false);
     });
 
-    // Cleanup on unmount
+    // Cleanup on unmount - but don't interfere with main portfolio animations
     return () => {
-      cleanupVanta();
+      // Only cleanup blog-specific effects, not the main portfolio topology effect
+      if (typeof window !== 'undefined') {
+        const vantaCanvases = document.querySelectorAll('.vanta-canvas');
+        vantaCanvases.forEach(canvas => {
+          const parent = canvas.parentElement;
+          if (parent && !parent.classList.contains('topology-effect-container')) {
+            canvas.remove();
+          }
+        });
+      }
     };
   }, []);
 

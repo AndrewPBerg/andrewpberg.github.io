@@ -20,11 +20,13 @@ const Layout = () => {
   const [activeSection, setActiveSection] = useState<string>('info');
   const [previousSection, setPreviousSection] = useState<string | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [topologyKey, setTopologyKey] = useState(0);
   const contentRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const buttonRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const tlRef = useRef<gsap.core.Timeline | null>(null);
   const { theme } = useTheme();
   const isMobile = useIsMobile();
+  const wasOnBlogRef = useRef(false);
   
   const memoizedActiveSection = useMemo(() => activeSection, [activeSection]);
   
@@ -52,6 +54,19 @@ const Layout = () => {
   
   useEffect(() => {
     const path = location.pathname.slice(1) || 'info';
+    
+    // Check if we're coming back from blog
+    if (wasOnBlogRef.current && path !== 'blog') {
+      // Force topology effect to remount when returning from blog
+      setTopologyKey(prev => prev + 1);
+      wasOnBlogRef.current = false;
+    }
+    
+    // Track if we're on blog page
+    if (location.pathname === '/blog') {
+      wasOnBlogRef.current = true;
+    }
+    
     if (path !== activeSection) {
       setPreviousSection(activeSection);
       setActiveSection(path);
@@ -125,9 +140,10 @@ const Layout = () => {
   }, [activeSection, previousSection, isMobile]);
   
   // Memoize the topology effect to prevent rerenders
+  // Only remount when returning from blog (topologyKey changes)
   const topologyEffect = useMemo(() => (
-    <TopologyEffect activeSection={memoizedActiveSection} />
-  ), [memoizedActiveSection]);
+    <TopologyEffect key={topologyKey} activeSection={memoizedActiveSection} />
+  ), [memoizedActiveSection, topologyKey]);
   
   return (
     <div className="min-h-screen flex flex-col p-4 md:p-8">

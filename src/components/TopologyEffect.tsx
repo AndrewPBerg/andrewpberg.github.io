@@ -47,13 +47,21 @@ const TopologyEffect = memo(({ activeSection = 'info' }: TopologyEffectProps) =>
     } else if (typeof window !== 'undefined') {
       // Just ensure THREE is on window
       (window as any).THREE = THREE;
+      // If p5 is already loaded, set the state
+      if (p5) {
+        setP5Loaded(true);
+      }
     }
     
     // Cleanup function
     return () => {
       isMounted = false;
       if (vantaEffectRef.current) {
-        vantaEffectRef.current.destroy();
+        try {
+          vantaEffectRef.current.destroy();
+        } catch (error) {
+          console.warn("Error destroying effect on unmount:", error);
+        }
         vantaEffectRef.current = null;
       }
     };
@@ -86,8 +94,23 @@ const TopologyEffect = memo(({ activeSection = 'info' }: TopologyEffectProps) =>
     const noiseSize = isMobile ? 0.001 : 0.004;
     const scale = isMobile ? 0.5 : 1.0;
 
-    // Only create new effect if it doesn't exist
-    if (!vantaEffectRef.current) {
+    // Check if effect exists and is still valid
+    const effectExists = vantaEffectRef.current && 
+                        vantaEffectRef.current.el && 
+                        vantaEffectRef.current.el.parentNode;
+
+    // Only create new effect if it doesn't exist or is invalid
+    if (!effectExists) {
+      // Clean up any existing effect first
+      if (vantaEffectRef.current) {
+        try {
+          vantaEffectRef.current.destroy();
+        } catch (error) {
+          console.warn("Error destroying existing effect:", error);
+        }
+        vantaEffectRef.current = null;
+      }
+
       try {
         vantaEffectRef.current = TOPOLOGY({
           el: vantaRef.current,
@@ -138,7 +161,7 @@ const TopologyEffect = memo(({ activeSection = 'info' }: TopologyEffectProps) =>
   return (
     <div 
       ref={vantaRef} 
-      className="fixed top-0 left-0 w-full h-full -z-10 opacity-70 will-change-transform" 
+      className="fixed top-0 left-0 w-full h-full -z-10 opacity-70 will-change-transform topology-effect-container" 
       aria-hidden="true"
       style={{ 
         transform: 'translate3d(0,0,0)',
