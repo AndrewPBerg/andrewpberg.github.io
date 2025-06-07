@@ -175,15 +175,15 @@ const Layout = () => {
                     ref={el => buttonRefs.current[section.id] = el}
                     className={`relative flex items-center justify-center h-3 w-3 rounded-full transition-colors duration-200 ${
                       section.id === activeSection 
-                        ? 'bg-primary' 
-                        : 'bg-muted-foreground/40 group-hover:bg-muted-foreground/70'
+                        ? 'bg-foreground shadow-md' 
+                        : 'bg-muted-foreground/30 group-hover:bg-foreground/60'
                     }`} 
                     style={{ transform: 'translateZ(0)' }}
                   />
                   <span className={`text-xs tracking-wide transition-colors duration-200 ${
                     section.id === activeSection 
-                      ? 'text-primary font-medium' 
-                      : 'text-muted-foreground group-hover:text-muted-foreground/80'
+                      ? 'text-foreground font-semibold drop-shadow-sm' 
+                      : 'text-muted-foreground/70 group-hover:text-foreground/90 group-hover:font-medium'
                   }`}>
                     {section.title}
                   </span>
@@ -236,14 +236,14 @@ const Layout = () => {
                       ref={el => buttonRefs.current[section.id] = el}
                       className={`relative h-2.5 w-2.5 rounded-full transition-colors duration-200 ${
                         section.id === activeSection 
-                          ? 'bg-primary' 
-                          : 'bg-muted-foreground/40 group-hover:bg-muted-foreground/70'
+                          ? 'bg-foreground shadow-md' 
+                          : 'bg-muted-foreground/30 group-hover:bg-foreground/60'
                       }`}
                     />
                     <span className={`text-xs tracking-wide transition-colors duration-200 ${
                       section.id === activeSection 
-                        ? 'text-primary font-medium' 
-                        : 'text-muted-foreground group-hover:text-muted-foreground/80'
+                        ? 'text-foreground font-semibold drop-shadow-sm' 
+                        : 'text-muted-foreground/70 group-hover:text-foreground/90 group-hover:font-medium'
                     }`}>
                       {section.title}
                     </span>

@@ -12,50 +12,75 @@ const Books = () => {
   
   const bookRecommendations = [
     {
-      title: "The Pragmatic Programmer",
-      author: "David Thomas & Andrew Hunt",
-      description: "Essential reading for any developer. Timeless principles that have shaped how I approach software development.",
-      category: "Programming",
+      title: "The Expanse Series",
+      author: "James S.A. Corey",
+      description: "Explores politics of a future star-spanning humanity",
+      categories: ["Sci-Fi", "Series", "Fiction"]
     },
     {
-      title: "Clean Code",
-      author: "Robert C. Martin",
-      description: "A handbook of agile software craftsmanship. Changed how I think about writing maintainable code.",
-      category: "Programming",
+      title: "The Giver Series",
+      author: "Lois Lowry",
+      description: "Isolated Dystopian society that lacks chaos ",
+      categories: ["Fiction", "Series", "Dystopian"]
     },
     {
-      title: "Designing Data-Intensive Applications",
-      author: "Martin Kleppmann",
-      description: "Deep dive into the architecture of modern data systems. Essential for understanding distributed systems.",
-      category: "Systems",
+      title: "Endurance: Shackleton's Incredible Voyage",
+      author: "Alfred Lansing",
+      description: "A true story of leadership in Antartica",
+      categories: ["Non-Fiction", "Adventure", "History","Biography"]
     },
     {
-      title: "The Design of Everyday Things",
-      author: "Don Norman",
-      description: "Fundamental principles of design that apply to both physical and digital products.",
-      category: "Design",
+      title: "Genghis Khan and the Making of the Modern World",
+      author: "Jack Weatherford",
+      description: "The bloody history of the Mongols",
+      categories: ["Non-Fiction", "History"]
     },
     {
-      title: "Atomic Habits",
-      author: "James Clear",
-      description: "Practical strategies for building good habits and breaking bad ones. Life-changing insights.",
-      category: "Personal Development",
+      title: "Genghis Khan and the Making of the Modern World",
+      author: "Jack Weatherford",
+      description: "The bloody history of the Mongols",
+      categories: ["Non-Fiction", "History"]
     },
     {
-      title: "The Lean Startup",
-      author: "Eric Ries",
-      description: "Revolutionary approach to building and launching successful products through validated learning.",
-      category: "Business",
+      title: "1984",
+      author: "George Orwell",
+      description: "A dystopian soceity of self-censorship",
+      categories: ["Fiction", "Dystopian", "Classics"]
     },
+    {
+      title: "Brave New World",
+      author: "Aldous Huxley",
+      description: "Dystopian exploration of a painless controlled society",
+      categories: ["Fiction", "Dystopian", "Classics"]
+    },
+    {
+      title: "The Devil in the White City",
+      author: "Eric Larson",
+      description: "The intersection of serial killings, engineering, and the 1893 world's fair",
+      categories: ["Non-Fiction", "History", "True Crime"]
+    },
+    {
+      title: "Man's Search for Meaning",
+      author: "Viktor E. Frankl",
+      description: "Frankl's lessons learned in Nazi camps",
+      categories: ["Non-Fiction", "History", "Philosophy","Self-Development","Psychology","Autobiography"]
+    },
+    {
+        title: "Atomic Habits",
+        author: "James Clear",
+        description: "1% Better",
+        categories: ["Non-Fiction", "Self-Development", "Psychology"]
+    }
+
   ];
 
   // Get unique categories for filtering
-  const categories = ['All', ...Array.from(new Set(bookRecommendations.map(book => book.category)))];
+  const categories = ['All', ...Array.from(new Set(bookRecommendations.flatMap(book => book.categories)))];
   
   // Filter books based on selected category
   const filteredBooks = selectedCategory === 'All' 
     ? bookRecommendations 
-    : bookRecommendations.filter(book => book.category === selectedCategory);
+    : bookRecommendations.filter(book => book.categories.includes(selectedCategory));
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -170,22 +195,24 @@ const Books = () => {
         
         {isDropdownOpen && (
           <div className="absolute top-full left-0 mt-1 w-full max-w-36 bg-background border border-border/30 rounded-md shadow-lg z-10 overflow-hidden">
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => {
-                  setSelectedCategory(category);
-                  setIsDropdownOpen(false);
-                }}
-                                 className={`w-full px-2 py-1.5 text-xs text-left hover:bg-muted/30 transition-colors ${
-                  selectedCategory === category
-                    ? 'bg-primary/10 text-primary'
-                    : 'text-foreground'
-                }`}
-              >
-                {category}
-              </button>
-            ))}
+            <div className="max-h-[168px] overflow-y-auto scrollbar-thin">
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  onClick={() => {
+                    setSelectedCategory(category);
+                    setIsDropdownOpen(false);
+                  }}
+                  className={`w-full px-2 py-1.5 text-xs text-left hover:bg-muted/30 transition-colors ${
+                    selectedCategory === category
+                      ? 'bg-primary/10 text-primary'
+                      : 'text-foreground'
+                  }`}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
           </div>
         )}
       </div>
@@ -201,10 +228,12 @@ const Books = () => {
                 <p className="text-xs text-muted-foreground">
                   by {book.author}
                 </p>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-[9px] text-muted-foreground/70 px-1.5 py-0.5 bg-muted/30 rounded-full">
-                    {book.category}
-                  </span>
+                <div className="flex items-center gap-1 mt-1 flex-wrap">
+                  {book.categories.map((category, catIndex) => (
+                    <span key={catIndex} className="text-[9px] text-muted-foreground/70 px-1.5 py-0.5 bg-muted/30 rounded-full">
+                      {category}
+                    </span>
+                  ))}
                 </div>
               </div>
               <p className="text-xs text-foreground/90 leading-relaxed">
