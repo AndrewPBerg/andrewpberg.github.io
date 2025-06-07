@@ -68,7 +68,7 @@ const Books = () => {
     {
         title: "Atomic Habits",
         author: "James Clear",
-        description: "1% Better",
+        description: "1% Better Every Day",
         categories: ["Non-Fiction", "Self-Development", "Psychology"]
     }
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, Calendar, Clock, Tag, Sun, Moon, Copy, Check, ChevronDown } from 'lucide-react';
+import { Link, useParams, useNavigate } from 'react-router-dom';
+import { ArrowLeft, Calendar, Clock, Tag, Sun, Moon, Copy, Check, ChevronDown, Share2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { Components } from 'react-markdown';
@@ -253,6 +253,8 @@ const markdownComponents: Components = {
 };
 
 const Blog = () => {
+  const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
   const [mounted, setMounted] = useState(false);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [filteredPosts, setFilteredPosts] = useState<BlogPost[]>([]);
@@ -262,6 +264,7 @@ const Blog = () => {
   const [sortBy, setSortBy] = useState<SortOption>('date-desc');
   const [selectedTag, setSelectedTag] = useState<string>('all');
   const [availableTags, setAvailableTags] = useState<string[]>([]);
+  const [showCopiedNotification, setShowCopiedNotification] = useState(false);
 
   // Load theme from localStorage on mount
   useEffect(() => {
@@ -270,6 +273,80 @@ const Blog = () => {
       setBlogTheme(savedTheme);
     }
   }, []);
+
+  // Handle URL-based post selection and update page metadata
+  useEffect(() => {
+    if (slug && blogPosts.length > 0) {
+      const post = blogPosts.find(p => p.slug === slug);
+      if (post) {
+        setSelectedPost(post);
+        // Update page title and meta description for better SEO
+        document.title = `${post.title} | Andrew P. Berg's Blog`;
+        const metaDescription = document.querySelector('meta[name="description"]');
+        if (metaDescription) {
+          metaDescription.setAttribute('content', post.excerpt);
+        } else {
+          const meta = document.createElement('meta');
+          meta.name = 'description';
+          meta.content = post.excerpt;
+          document.head.appendChild(meta);
+        }
+      } else {
+        // Post not found, redirect to blog list
+        navigate('/blog', { replace: true });
+      }
+    } else if (!slug) {
+      setSelectedPost(null);
+      // Reset page title for blog list
+      document.title = "Andrew P. Berg's Blog";
+      const metaDescription = document.querySelector('meta[name="description"]');
+      if (metaDescription) {
+        metaDescription.setAttribute('content', 'Informal posts about what I am learning/working on.');
+      }
+    }
+  }, [slug, blogPosts, navigate]);
+
+  // Function to navigate to individual post
+  const navigateToPost = (post: BlogPost) => {
+    navigate(`/blog/${post.slug}`);
+  };
+
+  // Function to navigate back to blog list
+  const navigateToList = () => {
+    navigate('/blog');
+  };
+
+  // Function to share current post
+  const sharePost = async (post: BlogPost) => {
+    const url = `${window.location.origin}${window.location.pathname}#/blog/${post.slug}`;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: post.title,
+          text: post.excerpt,
+          url: url,
+        });
+      } catch (err) {
+        // Fallback to clipboard if share fails
+        copyToClipboard(url);
+      }
+    } else {
+      // Fallback to clipboard
+      copyToClipboard(url);
+    }
+  };
+
+  // Function to copy URL to clipboard
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setShowCopiedNotification(true);
+      setTimeout(() => setShowCopiedNotification(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy to clipboard:', err);
+    }
+  };
 
   // Toggle theme function
   const toggleTheme = () => {
@@ -385,7 +462,7 @@ const Blog = () => {
           <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
             <div className="flex items-center justify-between">
               <button 
-                onClick={() => setSelectedPost(null)}
+                onClick={navigateToList}
                 className={`flex items-center gap-2 transition-colors ${
                   blogTheme === 'light'
                     ? 'text-gray-600 hover:text-gray-900'
@@ -396,6 +473,17 @@ const Blog = () => {
                 <span className="text-sm">Back to Blog</span>
               </button>
               <div className="flex items-center gap-3">
+                <button
+                  onClick={() => sharePost(selectedPost)}
+                  className={`p-2 rounded-full transition-colors ${
+                    blogTheme === 'light'
+                      ? 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                  }`}
+                  aria-label="Share post"
+                >
+                  <Share2 className="w-4 h-4" />
+                </button>
                 <button
                   onClick={toggleTheme}
                   className={`p-2 rounded-full transition-colors ${
@@ -421,6 +509,20 @@ const Blog = () => {
             </div>
           </div>
         </header>
+
+        {/* Copied Notification */}
+        {showCopiedNotification && (
+          <div className="fixed top-20 right-4 z-50 transform transition-all duration-300 ease-out">
+            <div className={`flex items-center gap-2 px-4 py-2 rounded-lg shadow-lg border backdrop-blur-sm ${
+              blogTheme === 'light'
+                ? 'bg-white/90 border-gray-200 text-gray-900'
+                : 'bg-card/90 border-border text-foreground'
+            }`}>
+              <Check className="w-4 h-4 text-green-500" />
+              <span className="text-sm font-medium">Link copied to clipboard</span>
+            </div>
+          </div>
+        )}
 
         {/* Post Content */}
         <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 md:py-12 relative z-10">
@@ -618,7 +720,7 @@ const Blog = () => {
                 <article 
                   key={post.id}
                   className="group cursor-pointer"
-                  onClick={() => setSelectedPost(post)}
+                  onClick={() => navigateToPost(post)}
                 >
                   <div className={`border rounded-lg p-4 sm:p-6 md:p-8 transition-all duration-300 hover:shadow-lg backdrop-blur-sm ${
                     blogTheme === 'light'
