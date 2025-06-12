@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { FileText, ExternalLink } from 'lucide-react';
+import { FileText, ExternalLink, Youtube } from 'lucide-react';
 
 const Publications = () => {
   const contentRef = useRef<HTMLDivElement>(null);
@@ -11,6 +11,7 @@ const Publications = () => {
       venue: "Intl. Conf. on  DATA Science, Technology, and Applications",
       year: "2025",
       link: "https://arxiv.org/abs/2505.23782",
+      youtubeLink: "https://www.youtube.com/watch?v=zFLgPipWOqI", // Optional YouTube presentation link
     },
    
   ];
@@ -33,14 +34,28 @@ const Publications = () => {
                 <h3 className="text-xs font-medium text-foreground leading-relaxed">
                   {pub.title}
                 </h3>
-                <a 
-                  href={pub.link}
-                  className="text-primary hover:text-primary/80 transition-colors flex-shrink-0"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <ExternalLink size={12} />
-                </a>
+                <div className="flex flex-col items-center gap-2 flex-shrink-0">
+                  {pub.youtubeLink && (
+                    <a 
+                      href={pub.youtubeLink}
+                      className="text-red-500 hover:text-red-600 transition-colors"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title="YouTube Presentation"
+                    >
+                      <Youtube size={16} />
+                    </a>
+                  )}
+                  <a 
+                    href={pub.link}
+                    className="text-primary hover:text-primary/80 transition-colors"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="View Publication"
+                  >
+                    <ExternalLink size={16} />
+                  </a>
+                </div>
               </div>
               <p className="text-[10px] text-muted-foreground">
                 {pub.authors}
