@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, memo } from 'react';
 import { useTheme } from '../hooks/useTheme';
-import TOPOLOGY from './vanta/topology.js';
+import EPHEMERAL from './vanta/ephemeral.js';
 import colorSchemes from '../config/colorSchemes';
 import * as THREE from 'three';
 import { useIsMobile } from '../hooks/use-mobile';
@@ -112,7 +112,7 @@ const TopologyEffect = memo(({ activeSection = 'info' }: TopologyEffectProps) =>
       }
 
       try {
-        vantaEffectRef.current = TOPOLOGY({
+        vantaEffectRef.current = EPHEMERAL({
           el: vantaRef.current,
           p5: p5,
           mouseControls: false, 
