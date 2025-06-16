@@ -1,4 +1,4 @@
-import{j as e}from"./ui-BzRICCdk.js";import{r as t}from"./vendor-BPGUGuwv.js";import{g as r}from"./animation-CwgPdEP7.js";import{G as i}from"./github-D599yR9R.js";import{c as s}from"./index-BckMnury.js";import{C as a}from"./chevron-down-BQ2jmHkB.js";
+import{j as e}from"./ui-BzRICCdk.js";import{r as t}from"./vendor-BPGUGuwv.js";import{g as r}from"./animation-CwgPdEP7.js";import{G as i}from"./github-CXOMVH5b.js";import{c as s}from"./index-B71oE3K1.js";import{C as a}from"./chevron-down-BOgvgMgu.js";
 /**
  * @license lucide-react v0.462.0 - ISC
  *
