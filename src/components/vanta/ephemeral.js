@@ -16,7 +16,10 @@ class Effect extends P5Base {
     // props continue to work.
     this.prototype.defaultOptions = {
       color: 0xffffff,          // stroke colour
-      backgroundColor: 0x000000 // canvas background
+      backgroundColor: 0x000000, // canvas background
+      speed: 1,                 // time-step multiplier (negative reverses direction)
+      zoom: 1,                  // overall zoom factor (>1 zooms in)
+      orbitScale: 1             // scales radius of motion ( <1 shrinks )
     };
   }
 
@@ -34,25 +37,31 @@ class Effect extends P5Base {
 
       // 400×400 is the reference resolution of the original sketch. We scale the
       // formula so that it nicely fills any canvas size.
-      let base = 400;
-      let scaleFactor;
+      const base = 400;
+      let scaleFactorX, scaleFactorY, offsetX, offsetY;
+      let orbitScale;
+      let layerOffsets = [];
+      const LAYERS = 3;
+      const particlesPerLayer = 3300; // ~1/3 of original 10k per frame
 
       // helper that encapsulates the original one-liner formula
       function drawPoint (x, y) {
         //  Port of the original golfed formula with variable names kept intact for
         //  readability of the port. Uses p5 trigonometric helpers.
         const k = 11 * p.cos(x / 8);
-        const e = y / 8 - 13;
+        const e = y / 8 - 12.5;
         const d = p.mag(k, e) ** 3 / 1499 + p.cos(e / 4 + time * 2) / 5 + 1;
         const q = 99 - e * p.sin(e) / d + k * (3 + p.sin(d * d - time * 2));
-        const c = d / 2 + e / 50 - time / 8;
+        const c = d / 2 + e / 99 - time / 8;
 
-        // original sketch draws into a 400×400 coordinate system centred at 200,200.
-        // We rescale to the current canvas size.
-        const px = (q * p.sin(c) + 300) * scaleFactor-.9;
-        const py = (q + 19 * d) * p.cos(c) + 200;
+        // Raw coordinates in original 400×400 space
+        const rawX = q * p.sin(c) * orbitScale + 170;
+        const rawY = (q + 19 * d) * orbitScale * p.cos(c) + 200;
 
-        p.point(px, py * scaleFactor);
+        const px = rawX * scaleFactorX + offsetX;
+        const py = rawY * scaleFactorY + offsetY;
+
+        p.point(px, py);
       }
 
       p.setup = function () {
@@ -62,8 +71,22 @@ class Effect extends P5Base {
         p.strokeWeight(1);
 
         // compute scaling based on current canvas size (square for simplicity)
-        const s = Math.min(t.width, t.height);
-        scaleFactor = s / base;
+        const zoom = typeof t.options.zoom === 'number' ? t.options.zoom : 1;
+        orbitScale = (typeof t.options.orbitScale === 'number') ? t.options.orbitScale : 1;
+
+        scaleFactorX = (t.width / base) * zoom * 4;
+        scaleFactorY = (t.height / base) * zoom * 4;
+        offsetX = (t.width - base * scaleFactorX) / 2;
+        offsetY = (t.height - base * scaleFactorY) / 2;
+
+        // Precompute per-layer extra offsets (in pixels) after scaling
+        const dx = t.width * 0.2;  // 12% of viewport width
+        const dy = t.height * 0.2; // 12% of viewport height
+        layerOffsets = [
+          { x: 0, y: 0 },
+          { x: dx, y: dy },
+          { x: -dx, y: dy },
+        ];
       };
 
       p.draw = function () {
@@ -71,11 +94,23 @@ class Effect extends P5Base {
         p.background(color2Hex(t.options.backgroundColor));
         p.stroke(color2Hex(t.options.color));
 
-        time += p.PI / 90;
+        // Advance the time variable. A negative speed value reverses the motion.
+        const speed = typeof t.options.speed === 'number' ? t.options.speed : 1;
+        time += (p.PI / 90) * speed * 0.12;
 
-        // draw 10k points per frame (same as original sketch)
-        for (let i = 10000; i--;) {
-          drawPoint(i % 200, i / 50);
+        // render each layer with its own offset
+        for (let l = 0; l < LAYERS; l++) {
+          const extra = layerOffsets[l];
+          for (let i = particlesPerLayer; i--;) {
+            // temporarily adjust global offsets for this layer
+            const prevOX = offsetX;
+            const prevOY = offsetY;
+            offsetX += extra.x;
+            offsetY += extra.y;
+            drawPoint(i % 200, i / 59);
+            offsetX = prevOX;
+            offsetY = prevOY;
+          }
         }
       };
     };
