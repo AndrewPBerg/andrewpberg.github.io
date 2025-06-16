@@ -110,10 +110,10 @@ const TopologyEffect = memo(({ activeSection = 'info' }: TopologyEffectProps) =>
     }
 
     // Optimized particle count for better performance and visual impact
-    const particleCount = isMobile ? 600 : 1200;
-    const particleSize = isMobile ? 1.4 : 1.2;
+    const particleCount = isMobile ? 400 : 1200;
+    const particleSize = isMobile ? 1 : 1.2;
     const noiseSize = isMobile ? 0.008 : 0.006;
-    const scale = isMobile ? 1.8 : 1.6;
+    const scale = isMobile ? 1.4 : 1.6;
 
     // Select effect implementation based on device
     const EffectImpl = isMobile ? TOPOLOGY : EPHEMERAL;
@@ -157,7 +157,7 @@ const TopologyEffect = memo(({ activeSection = 'info' }: TopologyEffectProps) =>
           colorMode: 'variance',
           colorVariance: 0.25, // More color variation for expressiveness
           pulseIntensity: 0.06, // Slightly more pulse for visual interest
-          pulseSpeed: 0.6, // Faster pulse for more dynamic feel
+          pulseSpeed: 0.4, // Faster pulse for more dynamic feel
           offset: 0.1, // Reduced to bring effect more toward center
           orbitScale: orbitScale,
         });

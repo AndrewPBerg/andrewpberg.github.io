@@ -36,7 +36,7 @@ class Effect extends P5Base {
       let noise_grid = []
       let flow_grid = []
 
-      let number_of_particles = t.options.particleCount || 4500
+      let number_of_particles = t.options.particleCount || 1200
       let particles = []
       let tick = 0
 
@@ -54,7 +54,7 @@ class Effect extends P5Base {
         //display_flow()
         update_particles()
         display_particles()
-        tick += 0.005
+        tick += 0.005 // effectively speed
       }
 
       function init_particles() {
@@ -73,10 +73,14 @@ class Effect extends P5Base {
       }
 
       function update_particles() {
+        // Real-time life decay: particles fade out over ~10 s regardless of frame rate
+        const dtSec = (p.deltaTime || 16.67) / 1000   // deltaTime in seconds (default ~60 FPS)
+        const lifeDecay = dtSec / 10                  // 1/10 s per second
+
         for (let i = 0; i < number_of_particles; i++) {
           let prt = particles[i]
           
-          prt.life -= 0.001
+          prt.life -= lifeDecay
           if (prt.life <= 0 || 
               prt.pos.x < 0 || prt.pos.x > p.width ||
               prt.pos.y < 0 || prt.pos.y > p.height) {
@@ -103,8 +107,8 @@ class Effect extends P5Base {
 
           let angle = p.noise(prt.seed * 0.01, tick) * p.TAU
           let circularMotion = p.createVector(
-            p.cos(angle) * 0.2,
-            p.sin(angle) * 0.2
+            p.cos(angle) * 0.03,
+            p.sin(angle) * 0.03
           )
 
           prt.pos.x += prt.vel.x + circularMotion.x
@@ -113,10 +117,10 @@ class Effect extends P5Base {
           prt.vel
             .add(prt.acc)
             .normalize()
-            .mult(2.5)
+            .mult(0.3)
 
           prt.acc = p.createVector(0, 0)
-          prt.acc.add(flow).mult(3)
+          prt.acc.add(flow).mult(0.4)
         }
       }
 
