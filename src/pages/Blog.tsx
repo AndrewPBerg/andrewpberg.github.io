@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Calendar, Clock, Tag, Sun, Moon, Copy, Check, ChevronDown, Share2 } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, Tag, Sun, Moon, Copy, Check, ChevronDown, Share2, ListTodo, X } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { Components } from 'react-markdown';
@@ -265,6 +265,8 @@ const Blog = () => {
   const [selectedTag, setSelectedTag] = useState<string>('all');
   const [availableTags, setAvailableTags] = useState<string[]>([]);
   const [showCopiedNotification, setShowCopiedNotification] = useState(false);
+  const [showFutureIdeas, setShowFutureIdeas] = useState(false);
+  const [futureIdeasContent, setFutureIdeasContent] = useState<string>('');
 
   // Load theme from localStorage on mount
   useEffect(() => {
@@ -277,26 +279,47 @@ const Blog = () => {
   // Handle URL-based post selection and update page metadata
   useEffect(() => {
     if (slug && blogPosts.length > 0) {
-      const post = blogPosts.find(p => p.slug === slug);
-      if (post) {
-        setSelectedPost(post);
-        // Update page title and meta description for better SEO
-        document.title = `${post.title} | Andrew P. Berg's Blog`;
+      if (slug === 'future_ideas') {
+        // Handle future_ideas route - show modal over blog list
+        setSelectedPost(null);
+        setShowFutureIdeas(true);
+        if (futureIdeasContent === '') {
+          loadFutureIdeas();
+        }
+        document.title = "Future Ideas | Andrew P. Berg's Blog";
         const metaDescription = document.querySelector('meta[name="description"]');
         if (metaDescription) {
-          metaDescription.setAttribute('content', post.excerpt);
+          metaDescription.setAttribute('content', 'A collection of interesting ideas and concepts I want to explore in the future.');
         } else {
           const meta = document.createElement('meta');
           meta.name = 'description';
-          meta.content = post.excerpt;
+          meta.content = 'A collection of interesting ideas and concepts I want to explore in the future.';
           document.head.appendChild(meta);
         }
       } else {
-        // Post not found, redirect to blog list
-        navigate('/blog', { replace: true });
+        const post = blogPosts.find(p => p.slug === slug);
+        if (post) {
+          setSelectedPost(post);
+          setShowFutureIdeas(false);
+          // Update page title and meta description for better SEO
+          document.title = `${post.title} | Andrew P. Berg's Blog`;
+          const metaDescription = document.querySelector('meta[name="description"]');
+          if (metaDescription) {
+            metaDescription.setAttribute('content', post.excerpt);
+          } else {
+            const meta = document.createElement('meta');
+            meta.name = 'description';
+            meta.content = post.excerpt;
+            document.head.appendChild(meta);
+          }
+        } else {
+          // Post not found, redirect to blog list
+          navigate('/blog', { replace: true });
+        }
       }
     } else if (!slug) {
       setSelectedPost(null);
+      setShowFutureIdeas(false);
       // Reset page title for blog list
       document.title = "Andrew P. Berg's Blog";
       const metaDescription = document.querySelector('meta[name="description"]');
@@ -304,7 +327,7 @@ const Blog = () => {
         metaDescription.setAttribute('content', 'Informal posts about what I am learning/working on.');
       }
     }
-  }, [slug, blogPosts, navigate]);
+  }, [slug, blogPosts, navigate, futureIdeasContent]);
 
   // Function to navigate to individual post
   const navigateToPost = (post: BlogPost) => {
@@ -345,6 +368,46 @@ const Blog = () => {
       setTimeout(() => setShowCopiedNotification(false), 2000);
     } catch (err) {
       console.error('Failed to copy to clipboard:', err);
+    }
+  };
+
+  // Function to load future_ideas.md content
+  const loadFutureIdeas = async () => {
+          try {
+        // Use Vite's import.meta.glob to load the specific file
+        const modules = import.meta.glob('/src/future/future_ideas.md', { 
+          as: 'raw',
+          eager: false
+        });
+        
+        const moduleKey = '/src/future/future_ideas.md';
+      if (modules[moduleKey]) {
+        const content = await modules[moduleKey]() as string;
+        setFutureIdeasContent(content || '# Future Ideas\n\n1. Add more future ideas here...');
+      } else {
+        setFutureIdeasContent('# Future Ideas\n\n1. Add more future ideas here...');
+      }
+    } catch (error) {
+      console.error('Failed to load future ideas:', error);
+      setFutureIdeasContent('# Future Ideas\n\n1. Add more future ideas here...');
+    }
+  };
+
+  // Function to toggle future ideas modal
+  const toggleFutureIdeas = () => {
+    if (!showFutureIdeas && futureIdeasContent === '') {
+      loadFutureIdeas();
+    }
+    if (showFutureIdeas) {
+      // If closing modal and we're on the future_ideas route, navigate back to blog
+      if (slug === 'future_ideas') {
+        navigate('/blog');
+      } else {
+        setShowFutureIdeas(false);
+      }
+    } else {
+      // If opening modal, navigate to the future_ideas route
+      navigate('/blog/future_ideas');
     }
   };
 
@@ -474,6 +537,20 @@ const Blog = () => {
               </button>
               <div className="flex items-center gap-3">
                 <button
+                  onClick={toggleFutureIdeas}
+                  className={`group p-2 rounded-full transition-all duration-300 hover:scale-110 active:scale-95 ${
+                    blogTheme === 'light'
+                      ? 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
+                      : 'text-muted-foreground hover:text-primary hover:bg-primary/10'
+                  }`}
+                  aria-label="View Future Ideas"
+                  title="Future Ideas"
+                >
+                  <ListTodo className={`w-4 h-4 transition-transform duration-300 group-hover:rotate-6 ${
+                    showFutureIdeas ? 'rotate-6' : ''
+                  }`} />
+                </button>
+                <button
                   onClick={() => sharePost(selectedPost)}
                   className={`p-2 rounded-full transition-colors ${
                     blogTheme === 'light'
@@ -574,6 +651,64 @@ const Blog = () => {
           </article>
         </main>
 
+        {/* Future Ideas Modal */}
+        {showFutureIdeas && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <div 
+              className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+              onClick={toggleFutureIdeas}
+            />
+            
+            {/* Modal Content */}
+            <div className={`relative w-full max-w-2xl max-h-[80vh] overflow-hidden rounded-lg border shadow-2xl animate-in slide-in-from-bottom-4 zoom-in-95 duration-300 ${
+              blogTheme === 'light'
+                ? 'bg-white border-gray-200'
+                : 'bg-card border-border'
+            }`}>
+              {/* Modal Header */}
+              <div className={`flex items-center justify-between p-4 sm:p-6 border-b ${
+                blogTheme === 'light' ? 'border-gray-200' : 'border-border'
+              }`}>
+                <div className="flex items-center gap-3">
+                  <ListTodo className={`w-5 h-5 ${
+                    blogTheme === 'light' ? 'text-blue-600' : 'text-primary'
+                  }`} />
+                  <h3 className={`text-lg sm:text-xl font-display font-semibold ${
+                    blogTheme === 'light' ? 'text-gray-900' : 'text-foreground'
+                  }`}>
+                    Future Ideas
+                  </h3>
+                </div>
+                <button
+                  onClick={toggleFutureIdeas}
+                  className={`p-2 rounded-lg transition-colors ${
+                    blogTheme === 'light'
+                      ? 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                  }`}
+                  aria-label="Close Future Ideas"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              
+              {/* Modal Body */}
+              <div className="p-4 sm:p-6 overflow-y-auto max-h-[60vh]">
+                <div className={`prose prose-sm sm:prose-base max-w-none prose-headings:font-display prose-headings:font-bold prose-h1:text-xl sm:prose-h1:text-2xl prose-h1:mb-3 sm:prose-h1:mb-4 prose-h2:text-lg sm:prose-h2:text-xl prose-h2:mb-2 sm:prose-h2:mb-3 prose-h3:text-base sm:prose-h3:text-lg prose-h3:mb-2 prose-p:mb-2 sm:prose-p:mb-3 prose-ul:mb-2 sm:prose-ul:mb-3 prose-ol:mb-2 sm:prose-ol:mb-3 prose-li:mb-1 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:text-xs sm:prose-pre:text-sm ${
+                  blogTheme === 'light' 
+                    ? 'prose-slate prose-headings:text-gray-900 prose-p:text-gray-700 prose-strong:text-gray-900 prose-em:text-gray-600 prose-code:bg-gray-100 prose-code:text-gray-800 prose-pre:bg-gray-100 prose-pre:border prose-pre:border-gray-200 prose-blockquote:border-l-gray-300 prose-blockquote:text-gray-600 prose-hr:border-gray-200'
+                    : 'prose-slate dark:prose-invert prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-em:text-muted-foreground prose-code:bg-muted prose-code:text-foreground prose-pre:bg-muted prose-pre:border prose-pre:border-border prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground prose-hr:border-border'
+                }`}>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+                    {futureIdeasContent || '# Future Ideas\n\nLoading...'}
+                  </ReactMarkdown>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Footer */}
         <footer className={`border-t mt-12 sm:mt-16 md:mt-20 relative z-10 ${
           blogTheme === 'light' ? 'border-gray-200' : 'border-border/50'
@@ -633,11 +768,27 @@ const Blog = () => {
       <main className="container mx-auto px-4 sm:px-6 py-8 sm:py-10 md:py-12 relative z-10">
         {/* Hero Section */}
         <div className="max-w-3xl mx-auto text-center mb-10 sm:mb-12 md:mb-16">
-          <h2 className={`text-3xl sm:text-4xl md:text-5xl font-display font-bold mb-4 sm:mb-6 ${
-            blogTheme === 'light' ? 'text-gray-900' : 'text-foreground'
-          }`}>
-            Andrew P. Berg's Blog
-          </h2>
+          <div className="flex items-center justify-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+            <button
+              onClick={toggleFutureIdeas}
+              className={`group flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg transition-all duration-300 hover:scale-110 active:scale-95 ${
+                blogTheme === 'light'
+                  ? 'text-gray-600 hover:text-blue-600 hover:bg-blue-50 border border-gray-200 hover:border-blue-300'
+                  : 'text-muted-foreground hover:text-primary hover:bg-primary/10 border border-border hover:border-primary/50'
+              }`}
+              aria-label="View Future Ideas"
+              title="Future Ideas"
+            >
+              <ListTodo className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:rotate-6 ${
+                showFutureIdeas ? 'rotate-6' : ''
+              }`} />
+            </button>
+            <h2 className={`text-3xl sm:text-4xl md:text-5xl font-display font-bold ${
+              blogTheme === 'light' ? 'text-gray-900' : 'text-foreground'
+            }`}>
+              Andrew P. Berg's Blog
+            </h2>
+          </div>
           <p className={`text-base sm:text-lg leading-relaxed px-2 sm:px-0 ${
             blogTheme === 'light' ? 'text-gray-600' : 'text-muted-foreground'
           }`}>
@@ -843,6 +994,64 @@ const Blog = () => {
           )}
         </div>
       </main>
+
+      {/* Future Ideas Modal */}
+      {showFutureIdeas && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={toggleFutureIdeas}
+          />
+          
+          {/* Modal Content */}
+          <div className={`relative w-full max-w-4xl max-h-[85vh] overflow-hidden rounded-lg border shadow-2xl animate-in slide-in-from-bottom-4 zoom-in-95 duration-300 ${
+            blogTheme === 'light'
+              ? 'bg-white border-gray-200'
+              : 'bg-card border-border'
+          }`}>
+            {/* Modal Header */}
+            <div className={`flex items-center justify-between p-4 sm:p-6 border-b ${
+              blogTheme === 'light' ? 'border-gray-200' : 'border-border'
+            }`}>
+              <div className="flex items-center gap-3">
+                <ListTodo className={`w-5 h-5 ${
+                  blogTheme === 'light' ? 'text-blue-600' : 'text-primary'
+                }`} />
+                <h3 className={`text-lg sm:text-xl font-display font-semibold ${
+                  blogTheme === 'light' ? 'text-gray-900' : 'text-foreground'
+                }`}>
+                  Future Ideas
+                </h3>
+              </div>
+              <button
+                onClick={toggleFutureIdeas}
+                className={`p-2 rounded-lg transition-colors ${
+                  blogTheme === 'light'
+                    ? 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                }`}
+                aria-label="Close Future Ideas"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            {/* Modal Body */}
+            <div className="p-4 sm:p-6 overflow-y-auto max-h-[70vh]">
+              <div className={`prose prose-sm sm:prose-base max-w-none prose-headings:font-display prose-headings:font-bold prose-h1:text-xl sm:prose-h1:text-2xl prose-h1:mb-3 sm:prose-h1:mb-4 prose-h2:text-lg sm:prose-h2:text-xl prose-h2:mb-2 sm:prose-h2:mb-3 prose-h3:text-base sm:prose-h3:text-lg prose-h3:mb-2 prose-p:mb-2 sm:prose-p:mb-3 prose-ul:mb-2 sm:prose-ul:mb-3 prose-ol:mb-2 sm:prose-ol:mb-3 prose-li:mb-1 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:text-xs sm:prose-pre:text-sm ${
+                blogTheme === 'light' 
+                  ? 'prose-slate prose-headings:text-gray-900 prose-p:text-gray-700 prose-strong:text-gray-900 prose-em:text-gray-600 prose-code:bg-gray-100 prose-code:text-gray-800 prose-pre:bg-gray-100 prose-pre:border prose-pre:border-gray-200 prose-blockquote:border-l-gray-300 prose-blockquote:text-gray-600 prose-hr:border-gray-200'
+                  : 'prose-slate dark:prose-invert prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-em:text-muted-foreground prose-code:bg-muted prose-code:text-foreground prose-pre:bg-muted prose-pre:border prose-pre:border-border prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground prose-hr:border-border'
+              }`}>
+                <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+                  {futureIdeasContent || '# Future Ideas\n\nLoading...'}
+                </ReactMarkdown>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
       <footer className={`border-t mt-12 sm:mt-16 md:mt-20 relative z-10 ${
