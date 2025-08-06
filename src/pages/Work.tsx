@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { Github, Globe, FileText, ChevronDown, File } from 'lucide-react';
+import { Github, Globe, FileText, ChevronDown, File, Youtube } from 'lucide-react';
 import gsap from 'gsap';
 
 const workItems = [
@@ -13,7 +13,8 @@ const workItems = [
       github: 'https://github.com/AndrewPBerg/UAV_Classification',
       website: null,
       paper: null,
-      pdfs: null
+      pdfs: null,
+      youtube: null
     }
   },
   {
@@ -26,7 +27,8 @@ const workItems = [
       github: 'https://github.com/AndrewPBerg/Fuzzify',
       website: 'https://fuzzify-jade.vercel.app/',
       paper: null,
-      pdfs: null
+      pdfs: null,
+      youtube: 'https://www.youtube.com/watch?v=olAi481-A0Y'
     }
   },
   {
@@ -39,7 +41,8 @@ const workItems = [
       github: 'https://github.com/AndrewPBerg/andrewpberg.github.io',
       website: 'https://andrewpberg.github.io',
       paper: null,
-      pdfs: null
+      pdfs: null,
+      youtube: null
     }
   },
   {
@@ -52,7 +55,8 @@ const workItems = [
       github: 'https://github.com/AndrewPBerg/Dope_Dictionary',
       website: null,
       paper: null,
-      pdfs: null
+      pdfs: null,
+      youtube: null
     }
   },
   {
@@ -65,7 +69,8 @@ const workItems = [
       github: 'https://github.com/riordanaa/Wine---price-ratings-prediction',
       website: null,
       paper: null,
-      pdfs: null
+      pdfs: null,
+      youtube: null
     }
   },
   {
@@ -78,7 +83,8 @@ const workItems = [
       github: null,
       website: 'https://www.carolinaswic.org/',
       paper: null,
-      pdfs: 'WIC_Poster_Andrew_Berg_2025.pdf'
+      pdfs: 'WIC_Poster_Andrew_Berg_2025.pdf',
+      youtube: 'https://www.youtube.com/watch?v=wjg381nPX_8'
     }
   },
   {
@@ -91,7 +97,8 @@ const workItems = [
       github: null,
       website: 'https://charleston.edu/academics/research/expo.php',
       paper: null,
-      pdfs: 'EXPO_Presentation_Andrew_Berg_2025.pdf'
+      pdfs: 'EXPO_Presentation_Andrew_Berg_2025.pdf',
+      youtube: 'https://www.youtube.com/watch?v=76DLp8WH5ik'
     }
   },
   {
@@ -104,7 +111,8 @@ const workItems = [
       github: null,
       website: null,
       paper: null,
-      pdfs: 'HS_mentorship_2025_Class_Syllabus.pdf'
+      pdfs: 'HS_mentorship_2025_Class_Syllabus.pdf',
+      youtube: null
     }
   },
 ];
@@ -288,6 +296,7 @@ const Work = () => {
                 {item.links.website && <a href={item.links.website} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors"><Globe size={16} /></a>}
                 {item.links.paper && <a href={item.links.paper} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors"><FileText size={16} /></a>}
                 {item.links.pdfs && <a href={`/src/pdfs/${item.links.pdfs}`} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors"><File size={16} /></a>}
+                {item.links.youtube && <a href={item.links.youtube} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors"><Youtube size={16} /></a>}
               </div>
               
               <div className="mt-3 flex flex-wrap gap-1">
