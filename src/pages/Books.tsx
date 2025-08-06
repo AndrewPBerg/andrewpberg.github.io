@@ -218,7 +218,7 @@ const Books = () => {
       </div>
       
       <div className="relative">
-        <div ref={booksRef} className="space-y-8 max-h-[400px] invisible-scroll pb-8">
+        <div ref={booksRef} className="space-y-8 max-h-[400px] overflow-y-auto pb-8 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/50 hover:scrollbar-thumb-white/70">
           {filteredBooks.map((book, index) => (
             <div key={index} className="group relative">
               <div className="space-y-1 mb-2">

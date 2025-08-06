@@ -7,10 +7,9 @@ import { TopologyEffect } from './TopologyEffect';
 import { ExternalLink } from 'lucide-react';
 
 const sections = [
-  { id: 'info', title: 'Info' },
-  { id: 'contact', title: 'Contact' },
+  { id: 'bio', title: 'Bio' },
   { id: 'stack', title: 'Stack' },
-  { id: 'projects', title: 'Projects' },
+  { id: 'work', title: 'Work' },
   { id: 'publications', title: 'Publications' },
   { id: 'books', title: 'Book Recs.' },
 ];
@@ -18,7 +17,7 @@ const sections = [
 const Layout = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [activeSection, setActiveSection] = useState<string>('info');
+  const [activeSection, setActiveSection] = useState<string>('bio');
   const [previousSection, setPreviousSection] = useState<string | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const [topologyKey, setTopologyKey] = useState(0);
@@ -54,7 +53,7 @@ const Layout = () => {
   }, [activeSection, isAnimating, navigate, previousSection, isMobile]);
   
   useEffect(() => {
-    const path = location.pathname.slice(1) || 'info';
+    const path = location.pathname.slice(1) || 'bio';
     
     // Check if we're coming back from blog
     if (wasOnBlogRef.current && path !== 'blog') {
@@ -258,7 +257,7 @@ const Layout = () => {
               <div 
                 key={section.id}
                 ref={el => contentRefs.current[section.id] = el}
-                className={`content-container glass-panel p-4 w-full mb-4 will-change-transform transition-all duration-300`}
+                className={`content-container glass-panel p-4 w-full mb-4 will-change-transform transition-all duration-300 min-h-[80vh]`}
                 style={{ 
                   opacity: 0, 
                   transform: 'translateZ(0)', 

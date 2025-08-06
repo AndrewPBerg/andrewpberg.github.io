@@ -131,7 +131,7 @@ const Publications = () => {
   return (
     <div className="space-y-4 antialiased will-change-transform">
       <p className="text-xs text-muted-foreground">
-        Research papers, articles, and technical writing hosted elsewhere.
+        Selected research papers, articles, and technical writing hosted elsewhere.
       </p>
 
       {/* Tag Filter Dropdown */}
@@ -172,7 +172,7 @@ const Publications = () => {
       </div>
       
       <div className="relative">
-        <div ref={contentRef} className="space-y-3 pt-2 max-h-[400px] invisible-scroll pb-8">
+        <div ref={contentRef} className="space-y-3 pt-2 max-h-[400px] overflow-y-auto pb-8 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/50 hover:scrollbar-thumb-white/70">
           {filteredPublications.map((pub, index) => (
             <div key={index} className="border-l-2 border-primary/20 pl-3 space-y-1">
               <div className="flex items-start justify-between gap-2">

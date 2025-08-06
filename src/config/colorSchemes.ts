@@ -35,7 +35,7 @@ const colorSchemes: ColorSchemes = {
       background: 0x0a0a0a,
       foreground: 0x7ba05b, // Muted green - soft tech vibe
     },
-    projects: {
+    work: {
       background: 0x0a0a0a,
       foreground: 0xb85450, // Muted red - understated
     },
@@ -61,7 +61,7 @@ const colorSchemes: ColorSchemes = {
       background: 0xf8f9fa,
       foreground: 0x5a7a4a, // Muted green - growth but gentle
     },
-    projects: {
+    work: {
       background: 0xf8f9fa,
       foreground: 0x9c5a5a, // Muted red - contrast but not harsh
     },

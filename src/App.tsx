@@ -9,9 +9,8 @@ import { ThemeProvider } from "./hooks/useTheme";
 
 // Lazy load components to improve initial load time
 const Layout = lazy(() => import("./components/Layout"));
-const Info = lazy(() => import("./pages/Info"));
-const Projects = lazy(() => import("./pages/Projects"));
-const Contact = lazy(() => import("./pages/Contact"));
+const Bio = lazy(() => import("./pages/Bio"));
+const Work = lazy(() => import("./pages/Work"));
 const Stack = lazy(() => import("./pages/Stack"));
 const Publications = lazy(() => import("./pages/Publications"));
 const Books = lazy(() => import("./pages/Books"));
@@ -53,10 +52,9 @@ const App = () => {
               <Suspense fallback={<div className="min-h-screen bg-background"></div>}>
                 <Routes>
                   <Route path="/" element={<Layout />}>
-                    <Route index element={<Navigate to="/info" replace />} />
-                    <Route path="info" element={<Info />} />
-                    <Route path="contact" element={<Contact />} />
-                    <Route path="projects" element={<Projects />} />
+                    <Route index element={<Navigate to="/bio" replace />} />
+                    <Route path="bio" element={<Bio />} />
+                    <Route path="work" element={<Work />} />
                     <Route path="stack" element={<Stack />} />
                     <Route path="publications" element={<Publications />} />
                     <Route path="books" element={<Books />} />
