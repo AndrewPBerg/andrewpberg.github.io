@@ -15,7 +15,7 @@ const Publications = () => {
       title: "4,500 Seconds: Small Data Training Approaches for Deep UAV Audio Classification",
       authors: "Berg, Zhang, Wang",
       venue: "Intl. Conf. on DATA Science, Technology, and Applications",
-      season: "Spring 2025",
+      season: "Summer 2025",
       link: "https://arxiv.org/abs/2505.23782",
       youtubeLink: "https://www.youtube.com/watch?v=zFLgPipWOqI",
       tags: ["Best Student Paper", "Oral", "Conference"]
@@ -24,9 +24,17 @@ const Publications = () => {
       title: "15,500 Seconds: Lean UAV Classification Leveraging PEFT and Pre-Trained Networks",
       authors: "Berg, Zhang, Wang",
       venue: "Under Review",
-      season: "Summer 2025",
+      season: "TBD",
       link: "https://arxiv.org/abs/2506.11049",
-      tags: ["Preprint"]
+      tags: ["Preprint","Under Review"]
+    },
+    {
+      title: "A Multiclass Acoustic Dataset and Interactive Tool for Analyzing Drone Signatures in Real-World Environments",
+      authors: "Wang, Linn, Berg, Zhang",
+      venue: "Under Review",
+      season: "TBD",
+      link: "",
+      tags: ["Under Review"]
     },
   ];
 
@@ -191,19 +199,30 @@ const Publications = () => {
                       <Youtube size={16} />
                     </a>
                   )}
-                  <a 
-                    href={pub.link}
-                    className="text-primary hover:text-primary/80 transition-colors"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    title="View Publication"
-                  >
-                    <ExternalLink size={16} />
-                  </a>
+                  {pub.link && (
+                    <a 
+                      href={pub.link}
+                      className="text-primary hover:text-primary/80 transition-colors"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title="View Publication"
+                    >
+                      <ExternalLink size={16} />
+                    </a>
+                  )}
                 </div>
               </div>
               <p className="text-[10px] text-muted-foreground">
-                {pub.authors}
+                {pub.authors.split(/,\s*/).map((author, i, arr) => (
+                  <span key={i}>
+                    {author.includes('Berg') ? (
+                      <b className="text-primary">{author}</b>
+                    ) : (
+                      author
+                    )}
+                    {i < arr.length - 1 ? ', ' : ''}
+                  </span>
+                ))}
               </p>
               <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
                 <span>{pub.venue} • {pub.season}</span>
