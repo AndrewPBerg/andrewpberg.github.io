@@ -1,14 +1,24 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { Github, Globe, FileText, ChevronDown, File, Youtube } from 'lucide-react';
+import { Github, Globe, FileText, ChevronDown, File, Youtube, Infinity } from 'lucide-react';
 import gsap from 'gsap';
 
 const workItems = [
   {
+    id: 'work0',
+    title: 'Yosoi',
+    description: 'Future of Web Scraping.',
+    tags: ['Scraping', 'Big Data'],
+    dateRange: 'Jan 2026 - Present',
+    links: {
+      github: "https://github.com/CascadingLabs/Yosoi",
+    }
+  },
+  {
     id: 'work1',
     title: 'UAV Classification',
     description: 'Transformer and CNN model training on a limited spectral dataset. Currently under review for publication(s).',
-    tags: ['Deep Learning','Signal Processing'],
-    dateRange: 'Sep 2024 - Present',
+    tags: ['Deep Learning', 'Signal Processing'],
+    dateRange: 'Sep 2024 - Dec 2025',
     links: {
       github: 'https://github.com/AndrewPBerg/UAV_Classification',
       website: null,
@@ -127,15 +137,15 @@ const monthMap: { [key: string]: number } = {
 const parseEndDate = (dateRange: string): Date => {
   const parts = dateRange.split(' - ');
   const endDateStr = parts.length > 1 ? parts[1] : parts[0];
-  
+
   if (endDateStr.toLowerCase() === 'present') {
     return new Date();
   }
-  
+
   const [monthStr, yearStr] = endDateStr.split(' ');
   const month = monthMap[monthStr];
   const year = parseInt(yearStr, 10);
-  
+
   if (isNaN(year) || month === undefined) {
     // Fallback for single month-year like "Feb 2025"
     const singleDate = new Date(endDateStr);
@@ -171,11 +181,11 @@ const Work = () => {
 
   useEffect(() => {
     if (!scrollIndicatorRef.current || !workContainerRef.current) return;
-    
+
     const tl = gsap.timeline({ repeat: -1, repeatDelay: 0.5 });
     tl.to(scrollIndicatorRef.current, { y: 6, duration: 0.8, ease: "sine.inOut" })
       .to(scrollIndicatorRef.current, { y: 0, duration: 0.8, ease: "sine.inOut" });
-    
+
     const handleScroll = () => {
       if (!workContainerRef.current) return;
       const { scrollTop, scrollHeight, clientHeight } = workContainerRef.current;
@@ -183,10 +193,10 @@ const Work = () => {
       setIsAtBottom(reachedBottom);
       gsap.to(scrollIndicatorRef.current, { rotation: reachedBottom ? 180 : 0, duration: 0.3, ease: "power2.out" });
     };
-    
+
     const workElement = workContainerRef.current;
     workElement.addEventListener('scroll', handleScroll);
-    
+
     return () => {
       tl.kill();
       if (workElement) workElement.removeEventListener('scroll', handleScroll);
@@ -212,7 +222,7 @@ const Work = () => {
     });
     return ['All', ...Array.from(tags).sort()];
   }, []);
-  
+
   const sortedAndFilteredWork = useMemo(() => {
     let filtered = workItems;
     if (selectedTag !== 'All') {
@@ -252,7 +262,7 @@ const Work = () => {
           </select>
           <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none text-muted-foreground" />
         </div>
-        
+
         {/* Tag Filters Dropdown */}
         <div ref={dropdownRef} className="relative sm:min-w-[120px]">
           <button
@@ -288,9 +298,18 @@ const Work = () => {
           {sortedAndFilteredWork.map((item) => (
             <div key={item.id} className="group relative">
               <h3 className="text-base font-medium font-display mb-1">{item.title}</h3>
-              <p className="text-xs text-muted-foreground mb-2">{item.dateRange}</p>
+              <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
+                {item.id === 'project5' ? (
+                  <>
+                    {item.dateRange.replace('Present', '').trim()}
+                    <Infinity size={14} className="text-primary" />
+                  </>
+                ) : (
+                  item.dateRange
+                )}
+              </p>
               <p className="mt-1 text-xs text-foreground/90">{item.description}</p>
-              
+
               <div className="mt-3 flex items-center gap-3">
                 {item.links.github && <a href={item.links.github} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors"><Github size={16} /></a>}
                 {item.links.website && <a href={item.links.website} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors"><Globe size={16} /></a>}
@@ -298,7 +317,7 @@ const Work = () => {
                 {item.links.pdfs && <a href={`/src/pdfs/${item.links.pdfs}`} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors"><File size={16} /></a>}
                 {item.links.youtube && <a href={item.links.youtube} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors"><Youtube size={16} /></a>}
               </div>
-              
+
               <div className="mt-3 flex flex-wrap gap-1">
                 {item.tags.map((tag) => (
                   <span key={tag} className="px-1.5 py-0.5 bg-secondary/50 text-secondary-foreground rounded-full text-[10px]">
@@ -309,7 +328,7 @@ const Work = () => {
             </div>
           ))}
         </div>
-        <div 
+        <div
           ref={scrollIndicatorRef}
           onClick={handleScrollClick}
           className="absolute bottom-0 left-1/2 -translate-x-1/2 flex items-center justify-center w-8 h-8 rounded-full bg-secondary/30 backdrop-blur-sm cursor-pointer hover:bg-secondary/50 transition-colors"

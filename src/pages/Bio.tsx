@@ -14,7 +14,7 @@ const XLogo = (props: React.SVGProps<SVGSVGElement>) => (
 
 const Bio = () => {
   const contentRef = useRef<HTMLDivElement>(null);
-  
+
   return (
     <div className="space-y-4 antialiased will-change-transform">
       <div ref={contentRef} className="space-y-4">
@@ -22,30 +22,29 @@ const Bio = () => {
         <h2 className="text-base font-large font-display  mb-1 antialiased will-change-transform">
           AI Engineer/Researcher
         </h2>
-        
+
         <p className="text-xs text-muted-foreground">
-          Building the future of intelligent applications, bias towards open-source and shipping fast.
+          Pushing the Limits of Agents, Narrow AI, and Data-Driven Systems.
         </p>
-        
+
         <p className="text-xs text-muted-foreground">
           Born in 2004 in New York. Currently in the Southeastern US. Looking to travel the world, then change it.
         </p>
 
         <p className="text-xs text-muted-foreground">
-          A.S. in Highschool, B.A. in CS at the College of Charleston, mentored by <a href="https://charleston.edu/compsci/faculty/wang-mia.php" className="underline underline-offset-2 decoration-blue-500 hover:text-primary transition-colors">Dr. Mia Wang</a>. 
-          
+          B.A. in CS at the College of Charleston, mentored by <a href="https://www.linkedin.com/in/mia-wang-cofc/" className="underline underline-offset-2 decoration-blue-500 hover:text-primary transition-colors">Dr. Mia Wang</a>.
+
           <br />
           <br />
-          Currently applying to PhD programs for NLP, DL, and HCI. 
+          Currently Engineering @ <a href="https://alitahealth.ai/" className="underline underline-offset-2 decoration-blue-500 hover:text-primary transition-colors">Alita AI</a>.
         </p>
 
         <hr className="my-2 border-muted-foreground/20" />
         <p className="text-xs text-muted-foreground pt-4">
-          Always looking for new work. <br />
-          Best way to reach me is email. <br />
+          You can reach me by email (just don't be weird) <br />
           Email for CV or business inquiries.
         </p>
-        
+
         <div className="space-y-3 pt-2">
           <div className="flex items-start">
             <Mail className="w-3 h-3 mt-0.5 mr-2 text-muted-foreground" />
@@ -56,8 +55,8 @@ const Bio = () => {
               </a>
             </div>
           </div>
-        
-          
+
+
           <div className="flex items-start">
             <MapPin className="w-3 h-3 mt-0.5 mr-2 text-muted-foreground" />
             <div>
@@ -66,57 +65,57 @@ const Bio = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="flex gap-2 pt-2">
-          <a 
-            href="https://github.com/AndrewPBerg" 
+          <a
+            href="https://github.com/AndrewPBerg"
             className="flex items-center justify-center w-6 h-6 rounded-full hover:text-primary transition-colors"
             aria-label="GitHub Profile"
           >
             <Github className="w-3 h-3" />
           </a>
-          
-          <a 
-            href="https://www.linkedin.com/in/andrew-berg-0822132b2/" 
+
+          <a
+            href="https://www.linkedin.com/in/andrew-berg-0822132b2/"
             className="flex items-center justify-center w-6 h-6 rounded-full hover:text-primary transition-colors"
             aria-label="LinkedIn Profile"
           >
             <Linkedin className="w-3 h-3" />
           </a>
-          
-          <a 
-            href="https://www.youtube.com/@AndrewPBerg" 
+
+          <a
+            href="https://www.youtube.com/@AndrewPBerg"
             className="flex items-center justify-center w-6 h-6 rounded-full hover:text-primary transition-colors"
             aria-label="YouTube Profile"
           >
             <Youtube className="w-3 h-3" />
           </a>
-          <a 
-            href="https://x.com/andrewpberg" 
+          <a
+            href="https://x.com/andrewpberg"
             className="flex items-center justify-center w-6 h-6 rounded-full hover:text-primary transition-colors"
             aria-label="X Profile"
           >
             <XLogo className="w-3 h-3" />
           </a>
 
-          <a 
-            href="https://scholar.google.com/citations?user=LRcHN1UAAAAJ&hl=en" 
+          <a
+            href="https://scholar.google.com/citations?user=LRcHN1UAAAAJ&hl=en"
             className="flex items-center justify-center w-6 h-6 rounded-full hover:text-primary transition-colors"
             aria-label="Google Scholar Profile"
           >
             <img src="/google_scholar.png" alt="Google Scholar" className="w-3 h-3" style={{ filter: 'invert(1)', transform: 'scale(1.5)' }} />
           </a>
 
-          <a 
-            href="https://www.semanticscholar.org/author/Andrew-P-Berg/2364685814" 
+          <a
+            href="https://www.semanticscholar.org/author/Andrew-P-Berg/2364685814"
             className="flex items-center justify-center w-6 h-6 rounded-full hover:text-primary transition-colors"
             aria-label="Semantic Scholar Profile"
           >
             <img src="/semantic_scholar.png" alt="Semantic Scholar" className="w-3 h-3" style={{ filter: 'invert(1)', transform: 'scale(1.5)' }} />
           </a>
 
-          <a 
-            href="https://orcid.org/0009-0000-1148-7174" 
+          <a
+            href="https://orcid.org/0009-0000-1148-7174"
             className="flex items-center justify-center w-6 h-6 rounded-full hover:text-primary transition-colors"
             aria-label="ORCID Profile"
           >
